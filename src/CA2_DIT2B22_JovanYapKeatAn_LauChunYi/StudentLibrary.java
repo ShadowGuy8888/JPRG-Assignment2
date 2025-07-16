@@ -26,21 +26,314 @@ public class StudentLibrary extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        studentAndBookOptions = new javax.swing.ButtonGroup();
+        searchForm = new javax.swing.JPanel();
+        searchLabel = new javax.swing.JLabel();
+        studentOption = new javax.swing.JRadioButton();
+        bookOption = new javax.swing.JRadioButton();
+        searchTextField = new javax.swing.JTextField();
+        searchButton = new javax.swing.JButton();
+        searchResultLabel = new javax.swing.JLabel();
+        searchResultPane = new javax.swing.JScrollPane();
+        displayStudentInfoBtn = new javax.swing.JButton();
+        borrowBookBtn = new javax.swing.JButton();
+        exitBtn = new javax.swing.JButton();
+        studentCarousell = new javax.swing.JPanel();
+        nameLabel = new javax.swing.JLabel();
+        studentIdLabel = new javax.swing.JLabel();
+        nameTextField = new javax.swing.JTextField();
+        studentIdTextField = new javax.swing.JTextField();
+        previousBtn = new javax.swing.JButton();
+        nextBtn = new javax.swing.JButton();
+        firstBtn = new javax.swing.JButton();
+        lastBtn = new javax.swing.JButton();
+        borrowedBooksCarousell = new javax.swing.JPanel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        searchForm.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        searchLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        searchLabel.setText("Search:");
+
+        studentAndBookOptions.add(studentOption);
+        studentOption.setFont(new java.awt.Font("Segoe UI", 0, 8)); // NOI18N
+        studentOption.setText("by Student");
+        studentOption.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                studentOptionActionPerformed(evt);
+            }
+        });
+
+        studentAndBookOptions.add(bookOption);
+        bookOption.setFont(new java.awt.Font("Segoe UI", 0, 8)); // NOI18N
+        bookOption.setText("by Book");
+        bookOption.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookOptionActionPerformed(evt);
+            }
+        });
+
+        searchTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchTextFieldActionPerformed(evt);
+            }
+        });
+
+        searchButton.setText("Search");
+        searchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout searchFormLayout = new javax.swing.GroupLayout(searchForm);
+        searchForm.setLayout(searchFormLayout);
+        searchFormLayout.setHorizontalGroup(
+            searchFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchFormLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(searchFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(searchTextField)
+                    .addGroup(searchFormLayout.createSequentialGroup()
+                        .addGroup(searchFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(searchFormLayout.createSequentialGroup()
+                                .addComponent(studentOption)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bookOption))
+                            .addComponent(searchLabel)
+                            .addComponent(searchButton))
+                        .addGap(0, 42, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        searchFormLayout.setVerticalGroup(
+            searchFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchFormLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(searchLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(searchFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(studentOption)
+                    .addComponent(bookOption))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+
+        searchResultLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        searchResultLabel.setText("Search Result");
+
+        displayStudentInfoBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        displayStudentInfoBtn.setText("Display Student Information");
+        displayStudentInfoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                displayStudentInfoBtnActionPerformed(evt);
+            }
+        });
+
+        borrowBookBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        borrowBookBtn.setText("Borrow Book");
+        borrowBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrowBookBtnActionPerformed(evt);
+            }
+        });
+
+        exitBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        exitBtn.setText("Exit");
+        exitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitBtnActionPerformed(evt);
+            }
+        });
+
+        studentCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Student 1 of 3", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 0, 10))); // NOI18N
+        studentCarousell.setForeground(new java.awt.Color(255, 255, 255));
+
+        nameLabel.setText("Name:");
+
+        studentIdLabel.setText("Student ID:");
+
+        nameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nameTextFieldActionPerformed(evt);
+            }
+        });
+
+        previousBtn.setText("Previous");
+
+        nextBtn.setText("Next");
+        nextBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nextBtnActionPerformed(evt);
+            }
+        });
+
+        firstBtn.setText("First");
+        firstBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                firstBtnActionPerformed(evt);
+            }
+        });
+
+        lastBtn.setText("Last");
+        lastBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lastBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout studentCarousellLayout = new javax.swing.GroupLayout(studentCarousell);
+        studentCarousell.setLayout(studentCarousellLayout);
+        studentCarousellLayout.setHorizontalGroup(
+            studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(studentCarousellLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(studentCarousellLayout.createSequentialGroup()
+                        .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(studentIdLabel)
+                            .addComponent(nameLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(studentIdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                            .addComponent(nameTextField)))
+                    .addGroup(studentCarousellLayout.createSequentialGroup()
+                        .addComponent(previousBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(nextBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(firstBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lastBtn)))
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+        studentCarousellLayout.setVerticalGroup(
+            studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(studentCarousellLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(nameLabel)
+                    .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(studentIdLabel)
+                    .addComponent(studentIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(previousBtn)
+                    .addComponent(nextBtn)
+                    .addComponent(firstBtn)
+                    .addComponent(lastBtn))
+                .addContainerGap(28, Short.MAX_VALUE))
+        );
+
+        borrowedBooksCarousell.setBackground(new java.awt.Color(102, 255, 255));
+        borrowedBooksCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "1 of 1", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 0, 10))); // NOI18N
+
+        javax.swing.GroupLayout borrowedBooksCarousellLayout = new javax.swing.GroupLayout(borrowedBooksCarousell);
+        borrowedBooksCarousell.setLayout(borrowedBooksCarousellLayout);
+        borrowedBooksCarousellLayout.setHorizontalGroup(
+            borrowedBooksCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        borrowedBooksCarousellLayout.setVerticalGroup(
+            borrowedBooksCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 170, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(studentCarousell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(borrowedBooksCarousell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(borrowBookBtn)
+                    .addComponent(exitBtn)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(searchResultLabel)
+                        .addComponent(searchForm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(searchResultPane))
+                    .addComponent(displayStudentInfoBtn))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(searchForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchResultLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchResultPane, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(displayStudentInfoBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(borrowBookBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(exitBtn))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(studentCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(borrowedBooksCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void studentOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentOptionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_studentOptionActionPerformed
+
+    private void bookOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookOptionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bookOptionActionPerformed
+
+    private void searchTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchTextFieldActionPerformed
+
+    private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchButtonActionPerformed
+
+    private void displayStudentInfoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayStudentInfoBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_displayStudentInfoBtnActionPerformed
+
+    private void borrowBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowBookBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_borrowBookBtnActionPerformed
+
+    private void exitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_exitBtnActionPerformed
+
+    private void nameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nameTextFieldActionPerformed
+
+    private void nextBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nextBtnActionPerformed
+
+    private void firstBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_firstBtnActionPerformed
+
+    private void lastBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lastBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -78,5 +371,27 @@ public class StudentLibrary extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton bookOption;
+    private javax.swing.JButton borrowBookBtn;
+    private javax.swing.JPanel borrowedBooksCarousell;
+    private javax.swing.JButton displayStudentInfoBtn;
+    private javax.swing.JButton exitBtn;
+    private javax.swing.JButton firstBtn;
+    private javax.swing.JButton lastBtn;
+    private javax.swing.JLabel nameLabel;
+    private javax.swing.JTextField nameTextField;
+    private javax.swing.JButton nextBtn;
+    private javax.swing.JButton previousBtn;
+    private javax.swing.JButton searchButton;
+    private javax.swing.JPanel searchForm;
+    private javax.swing.JLabel searchLabel;
+    private javax.swing.JLabel searchResultLabel;
+    private javax.swing.JScrollPane searchResultPane;
+    private javax.swing.JTextField searchTextField;
+    private javax.swing.ButtonGroup studentAndBookOptions;
+    private javax.swing.JPanel studentCarousell;
+    private javax.swing.JLabel studentIdLabel;
+    private javax.swing.JTextField studentIdTextField;
+    private javax.swing.JRadioButton studentOption;
     // End of variables declaration//GEN-END:variables
 }
