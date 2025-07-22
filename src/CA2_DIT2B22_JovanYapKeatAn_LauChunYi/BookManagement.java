@@ -5,7 +5,10 @@
 */
 package CA2_DIT2B22_JovanYapKeatAn_LauChunYi;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -24,62 +27,35 @@ public final class BookManagement {
      * Constructor pre-populates with sample book data
      */
     public BookManagement() {
-        this.addBook("Basic Java", "Peter Lim", 800372, 21.90, "Programming");
-        this.addBook("Java Script Essential", "Tim Steven", 800837, 19.90, "Programming");
-        this.addBook("ABC of Database", "Sue Ling", 800278, 15.90, "Programming");
-        this.addBook("Clean Code", "Robert C. Martin", 978013, 32.99, "Programming");
-        this.addBook("The Pragmatic Programmer", "Andrew Hunt", 978020, 28.50, "Software Engineering");
-    }
-
-    /**
-     * Main book management menu loop
-     */
-    public void run() {
-
-        while (true) {
-            String inputNo = JOptionPane.showInputDialog(
-                null, 
-                "Enter your option: \n\n1. Display all books\n2. Search book by title\n3. Add new book\n4. Display total books costs\n5. Exit\n\n ", 
-                "Mini Library System - Book Management", 
-                JOptionPane.QUESTION_MESSAGE
+        try {
+            Scanner scanner = new Scanner(
+                new File(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"
+                )
             );
-            if (inputNo == null) {
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Program exited.", 
-                    "Message", 
-                    JOptionPane.INFORMATION_MESSAGE
+            
+            // Skip total number of books (first line)
+            scanner.nextLine();
+
+            while (scanner.hasNextLine()) {
+                // Read book line
+                String bookLine = scanner.nextLine().trim();
+                String[] bookDetails = bookLine.split(";");
+                
+                // Add student
+                this.addBook(
+                    bookDetails[0], 
+                    bookDetails[1], 
+                    Integer.parseInt(bookDetails[2]), 
+                    Double.parseDouble(bookDetails[3]), 
+                    bookDetails[4], 
+                    Boolean.parseBoolean(bookDetails[5])
                 );
-                System.exit(0);
             }
-
-            inputNo = inputNo.trim();
-
-            switch (inputNo) {
-                case "1":
-                    this.displayAllBooks();
-                    break;
-                case "2":
-                    this.searchBookByTitle();
-                    break;
-                case "3":
-                    this.promptAndAddBook();
-                    break;
-                case "4":
-                    this.showTotalBooksCost();
-                    break;
-                case "5":
-                    StudentLibraryOld.run(); // Return to main menu
-                default:
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "Invalid input. Please enter 1, 2, 3, 4, or 5.", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                    break;
-            }
+            
+        } catch (IOException e) {
+            System.out.println(e);
         }
     }
 
@@ -90,9 +66,10 @@ public final class BookManagement {
      * @param ISBN
      * @param price
      * @param category
+     * @param availability
      */
-    public void addBook(String title, String author, Integer ISBN, Double price, String category) {
-        Book book = new Book(title, author, ISBN, price, category);
+    public void addBook(String title, String author, Integer ISBN, Double price, String category, Boolean availability) {
+        Book book = new Book(title, author, ISBN, price, category, availability);
         allBooks.add(book);
     }
 
@@ -124,58 +101,19 @@ public final class BookManagement {
     /**
      * Searches for book by exact title match
      */
-    public void searchBookByTitle() {
-        Book searchedBook = null;
+    public ArrayList<Book> searchBooksByTitle(String searchTitle) {
+        ArrayList<Book> searchedBooks = new ArrayList<>();
 
-        while (true) {
-            String searchTitle = JOptionPane.showInputDialog(
-                null, 
-                "Enter the Book name to search", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (searchTitle == null) return;
+        searchTitle = searchTitle.trim(); // clean the searchTitle input
 
-            searchTitle = searchTitle.trim(); // clean the searchTitle input
-
-            // Loop through all the library book objects to find the book
-            for (Book b : allBooks) {
-                if (b.getTitle().equals(searchTitle)) {
-                    searchedBook = b; // Once book is found, searchBook is no longer null
-                    break;
-                }
-            }
-
-            // book object of searchTitle can be found
-            if (searchedBook != null) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    String.format(
-                        "<html>" +
-                            "<table border='1' cellpadding='5' cellspacing='0'>" +
-                                "<tr><th colspan='2'>Book</th></tr>" +
-                                "<tr><td><b>Title</b></td><td>%s</td></tr>" +
-                                "<tr><td><b>Author</b></td><td>%s</td></tr>" +
-                                "<tr><td><b>Availability</b></td><td>%s</td></tr>" +
-                            "</table>" +
-                        "</html>",
-                        searchedBook.getTitle(),
-                        searchedBook.getAuthor(),
-                        searchedBook.getAvailability()
-                    ), 
-                    "Message", JOptionPane.INFORMATION_MESSAGE);
-            }
-            else { // book not found
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Cannot find the book \"" + searchTitle + "\"", 
-                    searchTitle, 
-                    JOptionPane.ERROR_MESSAGE
-                );
+        // Loop through all the library book objects to find the book
+        for (Book b : allBooks) {
+            if (b.getTitle().equals(searchTitle)) {
+                searchedBooks.add(b);
             }
         }
+
+        return searchedBooks;
     }
 
     /**
@@ -318,7 +256,7 @@ public final class BookManagement {
             } else break;
         }
 
-        this.addBook(title, author, Integer.parseInt(ISBN), Double.parseDouble(price), category);
+        this.addBook(title, author, Integer.parseInt(ISBN), Double.parseDouble(price), category, true);
         AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
         JOptionPane.showMessageDialog(
             null, 

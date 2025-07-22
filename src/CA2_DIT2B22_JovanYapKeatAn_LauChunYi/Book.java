@@ -19,13 +19,13 @@ public class Book {
     private Boolean availability;
 
 
-    public Book(String title, String author, Integer ISBN, Double price, String category) {
+    public Book(String title, String author, Integer ISBN, Double price, String category, Boolean availability) {
         this.title = title;
         this.author = author;
         this.ISBN = ISBN;
         this.price = price;
         this.category = category;
-        this.availability = true;
+        this.availability = availability;
     }
 
     public String getTitle() {

@@ -5,9 +5,12 @@
 */
 package CA2_DIT2B22_JovanYapKeatAn_LauChunYi;
 
+import java.io.File;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -23,79 +26,43 @@ public final class StudentManagement {
      * Constructor pre-populates with sample student data
      */
     public StudentManagement() {
-        this.addStudent("p111111", "John Tan");
-        this.addStudent("p222222", "Peter Goh");
-        this.addStudent("p333333", "Jack Lim");
-        this.addStudent("p444444", "Ken Lau");
-        this.addStudent("p555555", "Shawn Chan");
-        this.addStudent("p666666", "Sam Khoo");
-        this.addStudent("p777777", "Steve");
-        this.addStudent("p888888", "Max Loh");
-    }
-
-    /**
-     * Main student management menu loop
-     */
-    public void run() {
-        
-        while (true) {
-            String inputNo = JOptionPane.showInputDialog(
-                    null,
-                    "Enter your option:\n\n1. Display all students\n2. Search student by name\n3. Add new student\n4. Display total number of students\n5. Borrow Book\n6. Return Book\n7. Exit",
-                    "Mini Library System - Student Management",
-                    JOptionPane.QUESTION_MESSAGE
+        try {
+            Scanner scanner = new Scanner(
+                new File(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                )
             );
+            
+            // Skip total number of students (first line)
+            scanner.nextLine();
 
-            if (inputNo == null) { // User clicks cancel/close
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Program exited.", 
-                    "Message", 
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                System.exit(0);
-            }
+            while (scanner.hasNextLine()) {
+                // Read student line
+                String studentLine = scanner.nextLine().trim();
+                String[] studentDetails = studentLine.split(";");
+                
+                // Add student
+                this.addStudent(studentDetails[1], studentDetails[0]);
+                Student currentStudent = this.students.get(this.students.size() - 1);
 
-            inputNo = inputNo.trim(); // Remove starting/trailing whitespaces
+                int noOfBooksBorrowed = Integer.parseInt(scanner.nextLine().split(";")[0]);
 
-            switch (inputNo) {
-                case "1":
-                    this.displayAllStudents();
-                    break;
-
-                case "2":
-                    this.searchStudentByName();
-                    break;
-
-                case "3":
-                    this.promptAndAddStudent();
-                    break;
-
-                case "4":
-                    this.showTotalStudents();
-                    break;
-
-                case "5":
-                    this.promptAndBorrowBook();
-                    break;
-
-                case "6":
-                    this.promptAndReturnBook();
-                    break;
-
-                case "7":
-                    StudentLibraryOld.run(); // Return to main menu
-
-                default:
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "Invalid input. Please enter 1–6.", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
+                // Read book lines
+                for (int i = 0; i < noOfBooksBorrowed; i++) {
+                    String bookLine = scanner.nextLine().trim();
+                    String[] bookDetails = bookLine.split(";");
+                    
+                    currentStudent.borrowBook(
+                        BookManagement.allBooks.stream()
+                        .filter(b -> b.getISBN().toString().equals(bookDetails[2]))
+                        .findFirst()
+                        .orElse(null)
                     );
-                    break;
+                }
             }
+        } catch (IOException e) {
+            System.out.println(e);
         }
     }
 
@@ -146,62 +113,27 @@ public final class StudentManagement {
             JOptionPane.PLAIN_MESSAGE
         );
     }
+    
+    public ArrayList<Student> getStudents() {
+        return this.students;
+    }
 
     /**
      * Searches for a student by name
      */
-    public void searchStudentByName() {
-        Student searchedStudent = null;
+    public ArrayList<Student> searchStudentsByName(String searchName) {
+        ArrayList<Student> searchedStudents = new ArrayList<>();
 
-        while (true) {
-            String searchName = JOptionPane.showInputDialog(
-                null, 
-                "Enter the Student name to search:", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (searchName == null) // Handle cancel/close
-                return;
+        searchName = searchName.trim(); // Clean the searchName input
 
-            searchName = searchName.trim(); // Clean the searchName input
-        
-            // Loop through each student object
-            for (Student s : this.students) {
-                if (s.getName().equals(searchName)) {
-                    searchedStudent = s; // Searched student object
-                    break;
-                }
-            }
-
-            // searchedStudent is truthy; student object of searchName can be found
-            if (searchedStudent != null) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    String.format(
-                        "<html><table border='1'><tr><th>Admin#</th><th>Name</th><th>Books</th></tr><tr><td>%s</td><td>%s</td><td>%s</td></tr></table></html>", 
-                        searchedStudent.getAdminNumber(), 
-                        searchedStudent.getName(), 
-                        searchedStudent.getBooks()
-                    ), 
-                    "Student Found", 
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                return;
-
-            // Student object of searchName cannot be found
-            } else {
-                System.out.println("aaaaaaaaaaa");
-                System.out.println(System.getProperty("user.dir"));
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Cannot find the student \"" + searchName + "\" !!!", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
+        // Loop through each student object
+        for (Student s : this.students) {
+            if (s.getName().equals(searchName)) {
+                searchedStudents.add(s);
             }
         }
+
+        return searchedStudents;
     }
 
     /**

@@ -4,17 +4,49 @@
  */
 package CA2_DIT2B22_JovanYapKeatAn_LauChunYi;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+
 /**
  *
  * @author Jovan
  */
 public class StudentLibrary extends javax.swing.JFrame {
+    
+    private static BookManagement bookManagement = new BookManagement();
+    private static StudentManagement studentManagement = new StudentManagement();
+    
+    private static int studentCarousellIndex = 0;
+    private static int bookCarousellIndex = 0;
+    
+    private boolean searchBtnTriggered = false;
+    private boolean showMoreSearchResultDetails = false;
 
     /**
      * Creates new form StudentLibrary
      */
     public StudentLibrary() {
         initComponents();
+        
+//        this.updateStudentFields();
+//        this.updateBookFields();
     }
 
     /**
@@ -34,20 +66,34 @@ public class StudentLibrary extends javax.swing.JFrame {
         searchTextField = new javax.swing.JTextField();
         searchButton = new javax.swing.JButton();
         searchResultLabel = new javax.swing.JLabel();
-        searchResultPane = new javax.swing.JScrollPane();
-        displayStudentInfoBtn = new javax.swing.JButton();
         borrowBookBtn = new javax.swing.JButton();
+        displayStudentInfoBtn = new javax.swing.JButton();
         exitBtn = new javax.swing.JButton();
         studentCarousell = new javax.swing.JPanel();
         nameLabel = new javax.swing.JLabel();
         studentIdLabel = new javax.swing.JLabel();
-        nameTextField = new javax.swing.JTextField();
+        studentNameTextField = new javax.swing.JTextField();
         studentIdTextField = new javax.swing.JTextField();
-        previousBtn = new javax.swing.JButton();
-        nextBtn = new javax.swing.JButton();
-        firstBtn = new javax.swing.JButton();
-        lastBtn = new javax.swing.JButton();
-        borrowedBooksCarousell = new javax.swing.JPanel();
+        previousStudentBtn = new javax.swing.JButton();
+        nextStudentBtn = new javax.swing.JButton();
+        firstStudentBtn = new javax.swing.JButton();
+        lastStudentBtn = new javax.swing.JButton();
+        bookCarousell = new javax.swing.JPanel();
+        bookTitleLabel = new javax.swing.JLabel();
+        bookAuthorLabel = new javax.swing.JLabel();
+        bookIsbnLabel = new javax.swing.JLabel();
+        bookAvailableLabel = new javax.swing.JLabel();
+        bookTitleTextField = new javax.swing.JTextField();
+        bookAuthorTextField = new javax.swing.JTextField();
+        bookIsbnTextField = new javax.swing.JTextField();
+        bookAvailableTextField = new javax.swing.JTextField();
+        previousBookBtn = new javax.swing.JButton();
+        nextBookBtn = new javax.swing.JButton();
+        firstBookBtn = new javax.swing.JButton();
+        lastBookBtn = new javax.swing.JButton();
+        returnBookBtn = new javax.swing.JToggleButton();
+        searchResultScrollPane = new javax.swing.JScrollPane();
+        searchResultPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -59,6 +105,7 @@ public class StudentLibrary extends javax.swing.JFrame {
         studentAndBookOptions.add(studentOption);
         studentOption.setFont(new java.awt.Font("Segoe UI", 0, 8)); // NOI18N
         studentOption.setText("by Student");
+        studentOption.setSelected(true);
         studentOption.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 studentOptionActionPerformed(evt);
@@ -118,26 +165,27 @@ public class StudentLibrary extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(searchTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addComponent(searchButton)
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         searchResultLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         searchResultLabel.setText("Search Result");
+
+        borrowBookBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        borrowBookBtn.setText("Borrow Book");
+        borrowBookBtn.setVisible(false);
+        borrowBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrowBookBtnActionPerformed(evt);
+            }
+        });
 
         displayStudentInfoBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         displayStudentInfoBtn.setText("Display Student Information");
         displayStudentInfoBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 displayStudentInfoBtnActionPerformed(evt);
-            }
-        });
-
-        borrowBookBtn.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        borrowBookBtn.setText("Borrow Book");
-        borrowBookBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                borrowBookBtnActionPerformed(evt);
             }
         });
 
@@ -149,39 +197,51 @@ public class StudentLibrary extends javax.swing.JFrame {
             }
         });
 
-        studentCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Student 1 of 3", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 0, 10))); // NOI18N
+        studentCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Student 1 of 3", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 1, 12))); // NOI18N
         studentCarousell.setForeground(new java.awt.Color(255, 255, 255));
+        if (!studentManagement.getStudents().isEmpty()) {
+            Student initialStudent = studentManagement.getStudents().get(0);
+            studentNameTextField.setText(initialStudent.getName());
+            studentIdTextField.setText(initialStudent.getAdminNumber());
+            studentCarousell.putClientProperty("student", initialStudent);
+        }
+        this.updateStudentBorderTitle();
 
         nameLabel.setText("Name:");
 
         studentIdLabel.setText("Student ID:");
 
-        nameTextField.addActionListener(new java.awt.event.ActionListener() {
+        studentNameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nameTextFieldActionPerformed(evt);
+                studentNameTextFieldActionPerformed(evt);
             }
         });
 
-        previousBtn.setText("Previous");
-
-        nextBtn.setText("Next");
-        nextBtn.addActionListener(new java.awt.event.ActionListener() {
+        previousStudentBtn.setText("Previous");
+        previousStudentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nextBtnActionPerformed(evt);
+                previousStudentBtnActionPerformed(evt);
             }
         });
 
-        firstBtn.setText("First");
-        firstBtn.addActionListener(new java.awt.event.ActionListener() {
+        nextStudentBtn.setText("Next");
+        nextStudentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                firstBtnActionPerformed(evt);
+                nextStudentBtnActionPerformed(evt);
             }
         });
 
-        lastBtn.setText("Last");
-        lastBtn.addActionListener(new java.awt.event.ActionListener() {
+        firstStudentBtn.setText("First");
+        firstStudentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lastBtnActionPerformed(evt);
+                firstStudentBtnActionPerformed(evt);
+            }
+        });
+
+        lastStudentBtn.setText("Last");
+        lastStudentBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lastStudentBtnActionPerformed(evt);
             }
         });
 
@@ -199,15 +259,15 @@ public class StudentLibrary extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(studentIdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
-                            .addComponent(nameTextField)))
+                            .addComponent(studentNameTextField)))
                     .addGroup(studentCarousellLayout.createSequentialGroup()
-                        .addComponent(previousBtn)
+                        .addComponent(previousStudentBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(nextBtn)
+                        .addComponent(nextStudentBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(firstBtn)
+                        .addComponent(firstStudentBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lastBtn)))
+                        .addComponent(lastStudentBtn)))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         studentCarousellLayout.setVerticalGroup(
@@ -216,33 +276,172 @@ public class StudentLibrary extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nameLabel)
-                    .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(studentNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(studentIdLabel)
                     .addComponent(studentIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(studentCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(previousBtn)
-                    .addComponent(nextBtn)
-                    .addComponent(firstBtn)
-                    .addComponent(lastBtn))
-                .addContainerGap(28, Short.MAX_VALUE))
+                    .addComponent(previousStudentBtn)
+                    .addComponent(nextStudentBtn)
+                    .addComponent(firstStudentBtn)
+                    .addComponent(lastStudentBtn))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        borrowedBooksCarousell.setBackground(new java.awt.Color(102, 255, 255));
-        borrowedBooksCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "1 of 1", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 0, 10))); // NOI18N
+        bookCarousell.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "1 of 1", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 1, 12))); // NOI18N
+        Student initialStudent = studentManagement.getStudents().get(0);
 
-        javax.swing.GroupLayout borrowedBooksCarousellLayout = new javax.swing.GroupLayout(borrowedBooksCarousell);
-        borrowedBooksCarousell.setLayout(borrowedBooksCarousellLayout);
-        borrowedBooksCarousellLayout.setHorizontalGroup(
-            borrowedBooksCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        if (!initialStudent.getBooks().isEmpty()) {
+            Book initialBook = initialStudent.getBooks().get(bookCarousellIndex);
+
+            bookTitleTextField.setText(initialBook.getTitle());
+            bookAuthorTextField.setText(initialBook.getAuthor());
+            bookIsbnTextField.setText(Integer.toString(initialBook.getISBN()));
+            bookAvailableTextField.setText(Boolean.toString(initialBook.getAvailability()));
+
+            bookCarousell.putClientProperty("book", initialBook);
+        }
+        this.updateBookBorderTitle();
+
+        bookTitleLabel.setText("Title:");
+
+        bookAuthorLabel.setText("Author:");
+
+        bookIsbnLabel.setText("ISBN:");
+
+        bookAvailableLabel.setText("Available:");
+
+        bookTitleTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookTitleTextFieldActionPerformed(evt);
+            }
+        });
+
+        bookIsbnTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bookIsbnTextFieldActionPerformed(evt);
+            }
+        });
+
+        previousBookBtn.setText("Previous");
+        previousBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                previousBookBtnActionPerformed(evt);
+            }
+        });
+
+        nextBookBtn.setText("Next");
+        nextBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nextBookBtnActionPerformed(evt);
+            }
+        });
+
+        firstBookBtn.setText("First");
+        firstBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                firstBookBtnActionPerformed(evt);
+            }
+        });
+
+        lastBookBtn.setText("Last");
+        lastBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lastBookBtnActionPerformed(evt);
+            }
+        });
+
+        returnBookBtn.setText("Return Book");
+        returnBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                returnBookBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bookCarousellLayout = new javax.swing.GroupLayout(bookCarousell);
+        bookCarousell.setLayout(bookCarousellLayout);
+        bookCarousellLayout.setHorizontalGroup(
+            bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bookCarousellLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(bookCarousellLayout.createSequentialGroup()
+                        .addComponent(previousBookBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(nextBookBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(firstBookBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lastBookBtn))
+                    .addGroup(bookCarousellLayout.createSequentialGroup()
+                        .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(bookCarousellLayout.createSequentialGroup()
+                                .addComponent(bookIsbnLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bookIsbnTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(bookCarousellLayout.createSequentialGroup()
+                                .addComponent(bookAuthorLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bookAuthorTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(bookCarousellLayout.createSequentialGroup()
+                                .addComponent(bookTitleLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bookTitleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(bookCarousellLayout.createSequentialGroup()
+                                .addComponent(bookAvailableLabel)
+                                .addGap(18, 18, 18)
+                                .addComponent(bookAvailableTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(returnBookBtn)))
+                .addContainerGap(31, Short.MAX_VALUE))
+        );
+        bookCarousellLayout.setVerticalGroup(
+            bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bookCarousellLayout.createSequentialGroup()
+                .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bookCarousellLayout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bookTitleLabel)
+                            .addComponent(bookTitleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(13, 13, 13)
+                        .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bookAuthorLabel)
+                            .addComponent(bookAuthorTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(bookCarousellLayout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(returnBookBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bookIsbnLabel)
+                    .addComponent(bookIsbnTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bookAvailableLabel)
+                    .addComponent(bookAvailableTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(bookCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(previousBookBtn)
+                    .addComponent(nextBookBtn)
+                    .addComponent(firstBookBtn)
+                    .addComponent(lastBookBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout searchResultPanelLayout = new javax.swing.GroupLayout(searchResultPanel);
+        searchResultPanel.setLayout(searchResultPanelLayout);
+        searchResultPanelLayout.setHorizontalGroup(
+            searchResultPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        borrowedBooksCarousellLayout.setVerticalGroup(
-            borrowedBooksCarousellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 170, Short.MAX_VALUE)
+        searchResultPanelLayout.setVerticalGroup(
+            searchResultPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 66, Short.MAX_VALUE)
         );
+
+        searchResultScrollPane.setViewportView(searchResultPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -252,16 +451,15 @@ public class StudentLibrary extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(studentCarousell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(borrowedBooksCarousell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(bookCarousell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(borrowBookBtn)
                     .addComponent(exitBtn)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(searchResultLabel)
-                        .addComponent(searchForm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(searchResultPane))
-                    .addComponent(displayStudentInfoBtn))
+                    .addComponent(searchResultLabel)
+                    .addComponent(searchForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(displayStudentInfoBtn)
+                    .addComponent(searchResultScrollPane))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -270,22 +468,22 @@ public class StudentLibrary extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(studentCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bookCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(searchForm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(searchResultLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(searchResultPane, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(searchResultScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(displayStudentInfoBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(borrowBookBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(exitBtn))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(studentCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(borrowedBooksCarousell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(8, Short.MAX_VALUE))
+                        .addComponent(exitBtn)))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pack();
@@ -293,10 +491,16 @@ public class StudentLibrary extends javax.swing.JFrame {
 
     private void studentOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentOptionActionPerformed
         // TODO add your handling code here:
+        displayStudentInfoBtn.setVisible(true);
+        borrowBookBtn.setVisible(false);
+        this.searchBtnTriggered = false;
     }//GEN-LAST:event_studentOptionActionPerformed
 
     private void bookOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookOptionActionPerformed
         // TODO add your handling code here:
+        borrowBookBtn.setVisible(true);
+        displayStudentInfoBtn.setVisible(false);
+        this.searchBtnTriggered = false;
     }//GEN-LAST:event_bookOptionActionPerformed
 
     private void searchTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchTextFieldActionPerformed
@@ -305,35 +509,269 @@ public class StudentLibrary extends javax.swing.JFrame {
 
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         // TODO add your handling code here:
+        this.searchBtnTriggered = true;
+        searchResultPanel.removeAll();
+        searchResultPanel.setLayout(new BoxLayout(searchResultPanel, BoxLayout.Y_AXIS));
+        
+        if (studentOption.isSelected()) {
+            ArrayList<Student> searchedStudents = studentManagement.searchStudentsByName(searchTextField.getText());
+            
+            if (searchedStudents.size() > 0) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
+                
+                for (Student s : searchedStudents) {
+                    JLabel studentLabel = new JLabel(
+                        s.getName() + 
+                        (this.showMoreSearchResultDetails ? " " + s.getAdminNumber() : "")
+                    );
+                    studentLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // padding
+                    searchResultPanel.add(studentLabel);
+                }
+            } else 
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            
+        } else if (bookOption.isSelected()) {
+            ArrayList<Book> searchedBooks = bookManagement.searchBooksByTitle(searchTextField.getText());
+            
+            if (searchedBooks.size() > 0) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
+                
+                ButtonGroup bookGroup = new ButtonGroup();
+                
+                for (Book b : searchedBooks) {
+                    String availabilityText = b.getAvailability()
+                        ? "<font color='green'>Available</font>"
+                        : "<font color='red'>Unavailable</font>";
+                    JRadioButton bookOption = new JRadioButton(
+                        "<html>" + b.getTitle() + " (" + b.getISBN() + ") " + availabilityText + "</html>"
+                   );
+                    bookOption.putClientProperty("book", b); // Store the Book object in the respective radio options
+    
+                    bookGroup.add(bookOption);
+                    searchResultPanel.add(bookOption);
+                }
+            } else { // book not found
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            }
+        }
+        searchResultPanel.revalidate();
+        searchResultPanel.repaint();
+        searchResultPanel.setPreferredSize(new Dimension(searchResultPanel.getWidth(), 100));
+        searchResultScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        searchResultScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }//GEN-LAST:event_searchButtonActionPerformed
 
     private void displayStudentInfoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayStudentInfoBtnActionPerformed
         // TODO add your handling code here:
+        if (this.searchBtnTriggered) {
+            this.showMoreSearchResultDetails = !this.showMoreSearchResultDetails;
+            searchButton.doClick();
+        }
     }//GEN-LAST:event_displayStudentInfoBtnActionPerformed
 
+    private void borrowBookForStudentInDb(Book book, Student student) {
+        try {
+            List<String> lines = Files.readAllLines(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                )
+            );
+            ArrayList<String> updatedLines = new ArrayList<>();
+            
+            for (int i=0; i<lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.equals(student.getName() + ";" + student.getAdminNumber() + ";")) {
+                    updatedLines.add(line);
+                    updatedLines.add(Integer.toString(Integer.parseInt(lines.get(++i).split(";")[0]) + 1) + ";");
+                    updatedLines.add(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory());
+                    
+                } else 
+                    updatedLines.add(line);
+            }
+            
+            Files.write(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                ), 
+                updatedLines
+            );
+            
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+    
     private void borrowBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowBookBtnActionPerformed
         // TODO add your handling code here:
+        for (Component c : searchResultPanel.getComponents()) {
+            if (c instanceof JRadioButton) {
+                JRadioButton btn = (JRadioButton) c;
+                if (btn.isSelected()) {
+                    Book selectedBook = (Book) btn.getClientProperty("book");
+                    
+                    if (selectedBook.getAvailability()) {
+                        Student currentStudent = (Student) studentCarousell.getClientProperty("student");
+                        currentStudent.borrowBook(selectedBook);
+                        this.borrowBookForStudentInDb(selectedBook, currentStudent);
+                        break;
+                        
+                    } else 
+                        JOptionPane.showMessageDialog(this, "Book is currently unavailable!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
     }//GEN-LAST:event_borrowBookBtnActionPerformed
 
     private void exitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_exitBtnActionPerformed
 
-    private void nameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextFieldActionPerformed
+    private void studentNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentNameTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_nameTextFieldActionPerformed
+    }//GEN-LAST:event_studentNameTextFieldActionPerformed
 
-    private void nextBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBtnActionPerformed
+    private void updateStudentFields() {
+        if (studentManagement.getStudents().isEmpty()) {
+            studentNameTextField.setText("");
+            studentIdTextField.setText("");
+            return;
+        }
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        studentNameTextField.setText(currentStudent.getName());
+        studentIdTextField.setText(currentStudent.getAdminNumber());
+        studentCarousell.putClientProperty("student", currentStudent);
+    }
+    
+    private void updateStudentBorderTitle() {
+        studentCarousell.setBorder(
+            BorderFactory.createTitledBorder(
+                "Student " + (studentCarousellIndex + 1) + 
+                " of " + studentManagement.getStudents().size()
+            )
+        );
+    }
+    
+    private void updateBookBorderTitle() {
+        bookCarousell.setBorder(
+            BorderFactory.createTitledBorder(
+                "Book " + (bookCarousellIndex + 1) + 
+                " of " + studentManagement.getStudents().get(studentCarousellIndex).getBooks().size()
+            )
+        );
+    }
+    
+    private void updateBookFields() {
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        
+        if (currentStudent.getBooks().isEmpty()) {
+            bookTitleTextField.setText("");
+            bookAuthorTextField.setText("");
+            bookIsbnTextField.setText("");
+            bookAvailableTextField.setText("");
+            return;
+        }
+        Book currentBook = currentStudent.getBooks().get(bookCarousellIndex);
+        
+        bookTitleTextField.setText(currentBook.getTitle());
+        bookAuthorTextField.setText(currentBook.getAuthor());
+        bookIsbnTextField.setText(Integer.toString(currentBook.getISBN()));
+        bookAvailableTextField.setText(Boolean.toString(currentBook.getAvailability()));
+        bookCarousell.putClientProperty("book", currentBook);
+    }
+    
+//    private void updateBook
+    
+    private void nextStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStudentBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_nextBtnActionPerformed
+        if (studentCarousellIndex == studentManagement.getStudents().size() - 1) 
+            studentCarousellIndex = -1;
+        studentCarousellIndex++;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+        
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_nextStudentBtnActionPerformed
 
-    private void firstBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstBtnActionPerformed
+    private void firstStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstStudentBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_firstBtnActionPerformed
+        studentCarousellIndex = 0;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+        
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_firstStudentBtnActionPerformed
 
-    private void lastBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastBtnActionPerformed
+    private void lastStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastStudentBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_lastBtnActionPerformed
+        studentCarousellIndex = studentManagement.getStudents().size() - 1;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+        
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_lastStudentBtnActionPerformed
+
+    private void previousStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousStudentBtnActionPerformed
+        // TODO add your handling code here:
+        if (studentCarousellIndex == 0) studentCarousellIndex = studentManagement.getStudents().size();
+        studentCarousellIndex--;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+        
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_previousStudentBtnActionPerformed
+
+    private void bookIsbnTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookIsbnTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bookIsbnTextFieldActionPerformed
+
+    private void bookTitleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookTitleTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bookTitleTextFieldActionPerformed
+
+    private void returnBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnBookBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_returnBookBtnActionPerformed
+
+    private void nextBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBookBtnActionPerformed
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        if (bookCarousellIndex == currentStudent.getBooks().size() - 1 || currentStudent.getBooks().size() == 0) 
+            bookCarousellIndex = -1;
+        bookCarousellIndex++;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_nextBookBtnActionPerformed
+
+    private void previousBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousBookBtnActionPerformed
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        if (bookCarousellIndex == 0) 
+            bookCarousellIndex = currentStudent.getBooks().size();
+        bookCarousellIndex--;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_previousBookBtnActionPerformed
+
+    private void firstBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstBookBtnActionPerformed
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_firstBookBtnActionPerformed
+
+    private void lastBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastBookBtnActionPerformed
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        bookCarousellIndex = currentStudent.getBooks().size() - 1;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_lastBookBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -361,37 +799,52 @@ public class StudentLibrary extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(StudentLibrary.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new StudentLibrary().setVisible(true);
+                StudentLibrary studentLibrary = new StudentLibrary();
+                studentLibrary.setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel bookAuthorLabel;
+    private javax.swing.JTextField bookAuthorTextField;
+    private javax.swing.JLabel bookAvailableLabel;
+    private javax.swing.JTextField bookAvailableTextField;
+    private javax.swing.JPanel bookCarousell;
+    private javax.swing.JLabel bookIsbnLabel;
+    private javax.swing.JTextField bookIsbnTextField;
     private javax.swing.JRadioButton bookOption;
+    private javax.swing.JLabel bookTitleLabel;
+    private javax.swing.JTextField bookTitleTextField;
     private javax.swing.JButton borrowBookBtn;
-    private javax.swing.JPanel borrowedBooksCarousell;
     private javax.swing.JButton displayStudentInfoBtn;
     private javax.swing.JButton exitBtn;
-    private javax.swing.JButton firstBtn;
-    private javax.swing.JButton lastBtn;
+    private javax.swing.JButton firstBookBtn;
+    private javax.swing.JButton firstStudentBtn;
+    private javax.swing.JButton lastBookBtn;
+    private javax.swing.JButton lastStudentBtn;
     private javax.swing.JLabel nameLabel;
-    private javax.swing.JTextField nameTextField;
-    private javax.swing.JButton nextBtn;
-    private javax.swing.JButton previousBtn;
+    private javax.swing.JButton nextBookBtn;
+    private javax.swing.JButton nextStudentBtn;
+    private javax.swing.JButton previousBookBtn;
+    private javax.swing.JButton previousStudentBtn;
+    private javax.swing.JToggleButton returnBookBtn;
     private javax.swing.JButton searchButton;
     private javax.swing.JPanel searchForm;
     private javax.swing.JLabel searchLabel;
     private javax.swing.JLabel searchResultLabel;
-    private javax.swing.JScrollPane searchResultPane;
+    private javax.swing.JPanel searchResultPanel;
+    private javax.swing.JScrollPane searchResultScrollPane;
     private javax.swing.JTextField searchTextField;
     private javax.swing.ButtonGroup studentAndBookOptions;
     private javax.swing.JPanel studentCarousell;
     private javax.swing.JLabel studentIdLabel;
     private javax.swing.JTextField studentIdTextField;
+    private javax.swing.JTextField studentNameTextField;
     private javax.swing.JRadioButton studentOption;
     // End of variables declaration//GEN-END:variables
 }

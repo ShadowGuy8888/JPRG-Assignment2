@@ -1,0 +1,12 @@
+3;
+Tan Ben;2501234;
+3;
+Flutter ABC;Tim Joe;32011;33.9;Mobile App
+Java 123;Tan Ken;89011;12.9;Programming;
+Learn to Design Mobile App;Joan Chan;66011;25.9;Design;
+Janet Lee;2589238;
+1;
+Python for Data Science;Karen Lim;76111;29.9;Gen AI
+Danny Ang;2523833;
+1;
+JavaScript for Beginner;Paul Mad;30011;28.9;Programming;
