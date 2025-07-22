@@ -31,7 +31,7 @@ public final class BookManagement {
             Scanner scanner = new Scanner(
                 new File(
                     System.getProperty("user.dir") + 
-                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"
+                    "\\books.txt"
                 )
             );
             

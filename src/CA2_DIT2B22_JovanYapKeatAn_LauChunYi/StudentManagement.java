@@ -30,7 +30,7 @@ public final class StudentManagement {
             Scanner scanner = new Scanner(
                 new File(
                     System.getProperty("user.dir") + 
-                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                    "\\students.txt"
                 )
             );
             

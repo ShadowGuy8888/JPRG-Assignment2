@@ -574,7 +574,7 @@ public class StudentLibrary extends javax.swing.JFrame {
             List<String> lines = Files.readAllLines(
                 Paths.get(
                     System.getProperty("user.dir") + 
-                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                    "\\students.txt"
                 )
             );
             ArrayList<String> updatedLines = new ArrayList<>();
@@ -593,7 +593,7 @@ public class StudentLibrary extends javax.swing.JFrame {
             Files.write(
                 Paths.get(
                     System.getProperty("user.dir") + 
-                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                    "\\students.txt"
                 ), 
                 updatedLines
             );
