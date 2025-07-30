@@ -1,3 +1,5 @@
-2;
+4;
 Python for Data Science;Karen Lim;76111;29.9;Gen AI;true;
 Learn to Design Mobile App;Joan Chan;66011;25.9;Design;false;
+Java 123;Tan Ken;89011;12.9;Programming;false;
+Java 123;Tan Ken;89011;12.9;Programming;false;

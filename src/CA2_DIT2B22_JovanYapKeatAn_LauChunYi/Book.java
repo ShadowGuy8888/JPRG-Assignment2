@@ -27,6 +27,15 @@ public class Book {
         this.category = category;
         this.availability = availability;
     }
+    
+    public Book(String title, String author, String category) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.ISBN = 0;
+        this.price = 0.0;
+        this.availability = true;
+    }
 
     public String getTitle() {
         return this.title;

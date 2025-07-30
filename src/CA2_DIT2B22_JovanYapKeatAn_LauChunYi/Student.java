@@ -11,21 +11,22 @@ import java.util.ArrayList;
  *
  * @author Lau Chun Yi
  */
-public class Student { 
-    private String name;
+public class Student extends Person {
     private String adminNumber;
     private ArrayList<Book> books;
 
     public Student(String adminNumber, String name) {
         this.adminNumber = adminNumber;
-        this.name = name;
+        super(name);
         this.books = new ArrayList<>();
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -49,6 +50,19 @@ public class Student {
     public void borrowBook(Book book) {
         books.add(book);
         book.setAvailability(false);
+    }    
+
+    public void borrowBook(int isbn) {
+        Book book = BookManagement.allBooks.stream()
+            .filter(b -> b.getISBN() == isbn)
+            .findFirst()
+            .orElse(null);
+
+        if (book != null) {
+            this.borrowBook(book);
+            book.setAvailability(false);
+        } else 
+            System.out.println("Book with ISBN " + isbn + " not found.");
     }
 
     public void removeBook(int isbn) {

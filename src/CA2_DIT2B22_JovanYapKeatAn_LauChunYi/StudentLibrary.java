@@ -30,23 +30,23 @@ import javax.swing.JScrollPane;
  */
 public class StudentLibrary extends javax.swing.JFrame {
     
+    // Management objects for books and students, handling data logic
     private static BookManagement bookManagement = new BookManagement();
     private static StudentManagement studentManagement = new StudentManagement();
     
+    // Track current index in student and book carousels
     private static int studentCarousellIndex = 0;
     private static int bookCarousellIndex = 0;
     
-    private boolean searchBtnTriggered = false;
-    private boolean showMoreSearchResultDetails = false;
+    // Flags to control UI behavior for search
+    private boolean searchBtnTriggered = false; // Tracks if search button was pressed
+    private boolean showMoreSearchResultDetails = false; // Controls if detailed info shown in search results
 
     /**
      * Creates new form StudentLibrary
      */
     public StudentLibrary() {
         initComponents();
-        
-//        this.updateStudentFields();
-//        this.updateBookFields();
     }
 
     /**
@@ -489,6 +489,7 @@ public class StudentLibrary extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Handle student option selection - adjust button visibility
     private void studentOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentOptionActionPerformed
         // TODO add your handling code here:
         displayStudentInfoBtn.setVisible(true);
@@ -496,6 +497,7 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.searchBtnTriggered = false;
     }//GEN-LAST:event_studentOptionActionPerformed
 
+    // Handle book option selection - adjust button visibility
     private void bookOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookOptionActionPerformed
         // TODO add your handling code here:
         borrowBookBtn.setVisible(true);
@@ -507,21 +509,31 @@ public class StudentLibrary extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_searchTextFieldActionPerformed
 
+    /**
+     * Main search button handler.
+     * Performs search based on current radio selection (student or book),
+     * updates the searchResultPanel with matching results,
+     * plays sounds for success or failure.
+     */
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         // TODO add your handling code here:
-        this.searchBtnTriggered = true;
-        searchResultPanel.removeAll();
+        this.searchBtnTriggered = true; // Mark that a search was triggered
+        searchResultPanel.removeAll(); // Clear previous results
         searchResultPanel.setLayout(new BoxLayout(searchResultPanel, BoxLayout.Y_AXIS));
         
         if (studentOption.isSelected()) {
+            // Search students by name
             ArrayList<Student> searchedStudents = studentManagement.searchStudentsByName(searchTextField.getText());
             
             if (searchedStudents.size() > 0) {
                 AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
                 
+                // For each student found, create a JLabel showing their info
                 for (Student s : searchedStudents) {
                     String lbl = "<html>";
                     lbl += s.getName() + ", P" + s.getAdminNumber();
+                    
+                    // Optionally show borrowed books details if flag is set
                     if (this.showMoreSearchResultDetails) {
                         for (Book b : s.getBooks()) 
                             lbl += "<br />&nbsp;&nbsp;&nbsp;" + b.getTitle();
@@ -531,17 +543,19 @@ public class StudentLibrary extends javax.swing.JFrame {
                     studentLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // padding
                     searchResultPanel.add(studentLabel);
                 }
-            } else 
+            } else // Student not found
                 AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
             
         } else if (bookOption.isSelected()) {
+            // Search books by title
             ArrayList<Book> searchedBooks = bookManagement.searchBooksByTitle(searchTextField.getText());
             
             if (searchedBooks.size() > 0) {
                 AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
                 
-                ButtonGroup bookGroup = new ButtonGroup();
+                ButtonGroup bookGroup = new ButtonGroup(); // To group radio buttons for book selection
                 
+                // Create a radio button for each matching book showing title, ISBN, and availability
                 for (Book b : searchedBooks) {
                     String availabilityText = b.getAvailability()
                         ? "<font color='green'>Available</font>"
@@ -558,13 +572,21 @@ public class StudentLibrary extends javax.swing.JFrame {
                 AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
             }
         }
+        
+        // Refresh UI components after adding results
         searchResultPanel.revalidate();
         searchResultPanel.repaint();
+        
+        // Fix the preferred size of result panel and scrollbar policies
         searchResultPanel.setPreferredSize(new Dimension(searchResultPanel.getWidth(), 100));
         searchResultScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         searchResultScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }//GEN-LAST:event_searchButtonActionPerformed
 
+    /**
+     * Toggles detailed view of student search results (show borrowed books or not)
+     * When clicked, toggles the flag and re-triggers the search to update results.
+     */
     private void displayStudentInfoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_displayStudentInfoBtnActionPerformed
         // TODO add your handling code here:
         if (this.searchBtnTriggered) {
@@ -573,6 +595,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_displayStudentInfoBtnActionPerformed
 
+    /**
+     * Updates the student's record in the database (file) by adding a borrowed book.
+     * Reads the students.txt file, updates the borrowed book count and appends new book details.
+     */
     private void borrowBookForStudentInDb(Book book, Student student) {
         try {
             List<String> lines = Files.readAllLines(
@@ -586,12 +612,17 @@ public class StudentLibrary extends javax.swing.JFrame {
             for (int i=0; i<lines.size(); i++) {
                 String line = lines.get(i);
                 updatedLines.add(line);
+                
+                // Find the student's entry by matching name and admin number
                 if (line.equals(student.getName() + ";" + student.getAdminNumber() + ";")) {
+                    // Increment the number of borrowed books (next line)
                     updatedLines.add(Integer.toString(Integer.parseInt(lines.get(++i).split(";")[0]) + 1) + ";");
+                    // Append the new borrowed book info
                     updatedLines.add(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";");   
                 }
             }
             
+            // Write back the updated content to the file
             Files.write(
                 Paths.get(
                     System.getProperty("user.dir") + 
@@ -605,6 +636,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Removes a returned book from the student's record in the database (file).
+     * Decreases the borrowed book count and removes the specific book's details.
+     */
     private void returnBookForStudentInDb(Book book, Student student) {
         try {
             List<String> lines = Files.readAllLines(
@@ -618,19 +653,25 @@ public class StudentLibrary extends javax.swing.JFrame {
             for (int i=0; i<lines.size(); i++) {
                 String line = lines.get(i);
                 updatedLines.add(line);
+                
+                // Find the student record
                 if (line.equals(student.getName() + ";" + student.getAdminNumber() + ";")) {
                     int noOfBooksBorrowed = Integer.parseInt(lines.get(++i).split(";")[0]);
+                    // Decrement the borrowed book count
                     updatedLines.add(Integer.toString(noOfBooksBorrowed - 1) + ";");
+                    
                     int currentStudentLineIndex = i;
+                    // Iterate through borrowed books lines and skip the one to be returned
                     for (int j=currentStudentLineIndex; j<(currentStudentLineIndex+noOfBooksBorrowed); j++) {
                         line = lines.get(++i);
-                        if (!line.equals(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";")) {
+                        if (!line.equals(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";")) 
                             updatedLines.add(line);
-                        } else System.out.println(line);
+                        
                     }
                 }
             }
             
+            // Write updated lines back to the file
             Files.write(
                 Paths.get(
                     System.getProperty("user.dir") + 
@@ -644,6 +685,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Updates the availability status of a book in the books.txt file.
+     * Reads all books, updates the matched book's availability, then writes back.
+     */
     private void updateBookAvailabilityInDb(boolean status, Book book) {
         try {
             List<String> lines = Files.readAllLines(
@@ -653,7 +698,7 @@ public class StudentLibrary extends javax.swing.JFrame {
                 )
             );
             ArrayList<String> updatedLines = new ArrayList<>();
-            updatedLines.add(lines.get(0));
+            updatedLines.add(lines.get(0)); // Add header line (Total number of library books)
             
             for (int i=1; i<lines.size(); i++) { // skip first line of books.txt
                 String line = lines.get(i);
@@ -662,6 +707,7 @@ public class StudentLibrary extends javax.swing.JFrame {
                 updatedLines.add(line);
             }
             
+            // Write updated book list back to file
             Files.write(
                 Paths.get(
                     System.getProperty("user.dir") + 
@@ -674,6 +720,11 @@ public class StudentLibrary extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Handler for borrow book button.
+     * Checks which book is selected in the search results, verifies availability,
+     * updates student and book data accordingly, refreshes UI.
+     */
     private void borrowBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrowBookBtnActionPerformed
         // TODO add your handling code here:
         for (Component c : searchResultPanel.getComponents()) {
@@ -688,9 +739,9 @@ public class StudentLibrary extends javax.swing.JFrame {
                         this.borrowBookForStudentInDb(selectedBook, currentStudent);
                         this.updateBookAvailabilityInDb(false, selectedBook);
                         
-                        searchButton.doClick(); // Update display of availability status in search results
+                        searchButton.doClick(); // Refresh search results to update display of availability status for the book
     
-                        // Update book carousell data
+                        // Reset book carousel and update fields after borrowing
                         bookCarousellIndex = 0;
                         this.updateBookFields();
                         this.updateBookBorderTitle();
@@ -712,8 +763,13 @@ public class StudentLibrary extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_studentNameTextFieldActionPerformed
 
+    /**
+     * Updates the student display fields with current student's info from the carousel index.
+     * Sets the student name and ID text fields accordingly.
+     */
     private void updateStudentFields() {
         if (studentManagement.getStudents().isEmpty()) {
+            // Clear fields if no students loaded
             studentNameTextField.setText("");
             studentIdTextField.setText("");
             return;
@@ -721,9 +777,13 @@ public class StudentLibrary extends javax.swing.JFrame {
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         studentNameTextField.setText(currentStudent.getName());
         studentIdTextField.setText(currentStudent.getAdminNumber());
-        studentCarousell.putClientProperty("student", currentStudent);
+        studentCarousell.putClientProperty("student", currentStudent); // Store current student for reference
     }
     
+    /**
+     * Updates the border title of the student carousel panel
+     * Shows the current index out of total students.
+     */
     private void updateStudentBorderTitle() {
         studentCarousell.setBorder(
             BorderFactory.createTitledBorder(
@@ -733,6 +793,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         );
     }
     
+    /**
+     * Updates the border title of the book carousel panel
+     * Shows the current book index out of total books borrowed by current student.
+     */
     private void updateBookBorderTitle() {
         bookCarousell.setBorder(
             BorderFactory.createTitledBorder(
@@ -742,6 +806,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         );
     }
     
+    /**
+     * Updates the book detail fields to show the selected book's info.
+     * If no books are borrowed, clears fields and hides return button.
+     */
     private void updateBookFields() {
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         
@@ -760,11 +828,14 @@ public class StudentLibrary extends javax.swing.JFrame {
         bookAuthorTextField.setText(currentBook.getAuthor());
         bookIsbnTextField.setText(Integer.toString(currentBook.getISBN()));
         bookAvailableTextField.setText(Boolean.toString(currentBook.getAvailability()));
-        bookCarousell.putClientProperty("book", currentBook);
+        bookCarousell.putClientProperty("book", currentBook); // Store current book for reference
     }
     
-//    private void updateBook
-    
+    /**
+     * Moves the student carousel to the next student.
+     * Loops back to first student if at end.
+     * Also resets the book carousel and updates display.
+     */
     private void nextStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextStudentBtnActionPerformed
         // TODO add your handling code here:
         if (studentCarousellIndex == studentManagement.getStudents().size() - 1) 
@@ -778,6 +849,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.updateBookBorderTitle();
     }//GEN-LAST:event_nextStudentBtnActionPerformed
 
+    /**
+     * Moves to the first student in the carousel.
+     * Resets book carousel as well and updates UI.
+     */
     private void firstStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstStudentBtnActionPerformed
         // TODO add your handling code here:
         studentCarousellIndex = 0;
@@ -789,6 +864,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.updateBookBorderTitle();
     }//GEN-LAST:event_firstStudentBtnActionPerformed
 
+    /**
+     * Moves to the last student in the list.
+     * Also resets book carousel and updates fields.
+     */
     private void lastStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastStudentBtnActionPerformed
         // TODO add your handling code here:
         studentCarousellIndex = studentManagement.getStudents().size() - 1;
@@ -800,6 +879,11 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.updateBookBorderTitle();
     }//GEN-LAST:event_lastStudentBtnActionPerformed
 
+    /**
+     * Moves to the previous student in the list.
+     * If at first student, loops around to the end.
+     * Also resets and updates the book carousel.
+     */
     private void previousStudentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousStudentBtnActionPerformed
         // TODO add your handling code here:
         if (studentCarousellIndex == 0) studentCarousellIndex = studentManagement.getStudents().size();
@@ -820,6 +904,12 @@ public class StudentLibrary extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_bookTitleTextFieldActionPerformed
 
+    /**
+     * Handles return book button click.
+     * Removes book from student’s local and file records,
+     * updates book availability in database,
+     * and refreshes UI.
+     */
     private void returnBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnBookBtnActionPerformed
         // TODO add your handling code here:
         Book returnBook = (Book) bookCarousell.getClientProperty("book");
@@ -830,12 +920,16 @@ public class StudentLibrary extends javax.swing.JFrame {
         
         searchButton.doClick(); // Reload display of search results for student/book details
 
-        // Update book carousell data
+        // Reset and update book carousell
         bookCarousellIndex = 0;
         this.updateBookFields();
         this.updateBookBorderTitle();
     }//GEN-LAST:event_returnBookBtnActionPerformed
 
+    /**
+     * Moves to the next book borrowed by the current student.
+     * Loops back to start if at the last book.
+     */
     private void nextBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBookBtnActionPerformed
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         if (bookCarousellIndex == currentStudent.getBooks().size() - 1 || currentStudent.getBooks().size() == 0) 
@@ -845,6 +939,10 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.updateBookBorderTitle();
     }//GEN-LAST:event_nextBookBtnActionPerformed
 
+    /**
+     * Moves to the previous book borrowed by the current student.
+     * Loops back to the end if currently at the first book.
+     */
     private void previousBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousBookBtnActionPerformed
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         if (bookCarousellIndex == 0 || currentStudent.getBooks().size() == 0) 
@@ -854,12 +952,20 @@ public class StudentLibrary extends javax.swing.JFrame {
         this.updateBookBorderTitle();
     }//GEN-LAST:event_previousBookBtnActionPerformed
 
+    /**
+     * Moves to the first book in the current student's borrowed books.
+     * Updates book display fields accordingly.
+     */
     private void firstBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_firstBookBtnActionPerformed
         bookCarousellIndex = 0;
         this.updateBookFields();
         this.updateBookBorderTitle();
     }//GEN-LAST:event_firstBookBtnActionPerformed
 
+    /**
+     * Moves to the last book borrowed by the current student.
+     * Updates the display fields to reflect selected book.
+     */
     private void lastBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lastBookBtnActionPerformed
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         bookCarousellIndex = currentStudent.getBooks().size() - 1;

@@ -14,18 +14,23 @@ import javax.swing.JOptionPane;
 
 /**
  * @author Jovan
- * Handles all book-related operations including:
- * - Book inventory management
- * - Search functionality
- * - Cost calculations
+ */
+
+/**
+ * BookManagement class handles the creation, loading, 
+ * validation, searching, and deletion of book records.
  */
 public final class BookManagement {
 
+    // Shared static list of all books in the system
     static ArrayList<Book> allBooks = new ArrayList<>();
+    
+    // Flag used to check whether a book was added successfully
     Boolean addBookSuccess = false;
 
     /**
-     * Constructor pre-populates with sample book data
+     * Constructor loads initial book data from a text file.
+     * File must follow a specific format (see below).
      */
     public BookManagement() {
         try {
@@ -39,12 +44,12 @@ public final class BookManagement {
             // Skip total number of books (first line)
             scanner.nextLine();
 
+            // Read and parse each book entry line
             while (scanner.hasNextLine()) {
-                // Read book line
                 String bookLine = scanner.nextLine().trim();
                 String[] bookDetails = bookLine.split(";");
                 
-                // Add student
+                // Create and add book using parsed values
                 this.addBook(
                     bookDetails[0], 
                     bookDetails[1], 
@@ -61,7 +66,7 @@ public final class BookManagement {
     }
 
     /**
-     * Adds a new book to inventory
+     * Adds a new book to library.
      * @param title
      * @param author
      * @param ISBN
@@ -74,37 +79,18 @@ public final class BookManagement {
         allBooks.add(book);
     }
     
+    /**
+     * Retrieves all books in the system.
+     * @return List of Book objects
+     */
     public ArrayList<Book> getBooks() {
         return BookManagement.allBooks;
     }
 
     /**
-     * Displays all books in formatted HTML table
-     */
-    public void displayAllBooks() {
-        StringBuilder htmlTable = new StringBuilder("<html><table border='1'>");
-        htmlTable.append("<tr><th>ISBN</th><th>Title</th><th>Author</th><th>Availability</th></tr>");
-        for (int i=0; i<allBooks.size(); i++) {
-            htmlTable.append(String.format(
-                "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
-                allBooks.get(i).getISBN(), 
-                allBooks.get(i).getTitle(), 
-                allBooks.get(i).getAuthor(), 
-                allBooks.get(i).getAvailability()
-            ));
-        }
-        
-        htmlTable.append("</table></html>");
-        JOptionPane.showMessageDialog(
-            null, 
-            htmlTable.toString(), 
-            "Student List", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    /**
-     * Searches for book by exact title match
+     * Searches for books by exact title.
+     * @param searchTitle Title to search for
+     * @return List of matching books
      */
     public ArrayList<Book> searchBooksByTitle(String searchTitle) {
         ArrayList<Book> searchedBooks = new ArrayList<>();
@@ -122,10 +108,18 @@ public final class BookManagement {
     }
 
     /**
-     * Handles new book addition with validation
+     * Adds a new book after validating all input fields.
+     * Displays appropriate dialogs and sounds for errors or success.
+     * @param title Book title
+     * @param author Book author
+     * @param ISBN ISBN (as String, validated later)
+     * @param price Book price
+     * @param category Book category
+     * @param availability Initial availability status
      */
     public void promptAndAddBook(String title, String author, String ISBN, Double price, String category, Boolean availability) {
         
+        // Title validation
         if (title == null || title.length() < 3) {
             AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
             JOptionPane.showMessageDialog(
@@ -147,7 +141,7 @@ public final class BookManagement {
             ); return;
         }
         
-        // Check if ISBN is a valid number
+        // ISBN validation
         int number;
         try {
             number = Integer.parseInt(ISBN);
@@ -157,7 +151,7 @@ public final class BookManagement {
             return;
         }
 
-        // Check for duplicate admin number
+        // Duplicate ISBN check
         for (Book b : allBooks) {
             if (b.getISBN() == number) {
                 AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
@@ -170,37 +164,39 @@ public final class BookManagement {
             }
         }
        
-            // Price validation
-            if (price == null || !String.valueOf(price).matches("^\\d+(\\.\\d+)?$")) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Please enter a valid number.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                ); return;
-            } else if (price < 5.0) { 
-                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Minimum price is $5.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                ); return;
-            }
+        // Price validation (must be numeric and >= $5)
+        if (price == null || !String.valueOf(price).matches("^\\d+(\\.\\d+)?$")) {
+            AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
+            JOptionPane.showMessageDialog(
+                null, 
+                "Please enter a valid number.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            ); 
+            return;
+            
+        } else if (price < 5.0) { 
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+            JOptionPane.showMessageDialog(
+                null, 
+                "Minimum price is $5.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            ); return;
+        }
 
-            // Category validation
-            if (category == null || category.length() < 3) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Book category must be at least 3 characters long.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                ); return;
-            } 
-        
-            addBookSuccess = true;
+        // Category validation
+        if (category == null || category.length() < 3) {
+            AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
+            JOptionPane.showMessageDialog(
+                null, 
+                "Book category must be at least 3 characters long.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            ); return;
+        } 
+
+        addBookSuccess = true;
         this.addBook(title, author, number, price, category, true);
         AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
         JOptionPane.showMessageDialog(
@@ -211,6 +207,10 @@ public final class BookManagement {
         );
     }
     
+    /**
+     * Deletes a book from the system using its ISBN.
+     * @param ISBN ISBN number of book to delete
+     */
     public void deleteBook(String ISBN) {
         boolean found = false;
         ISBN = ISBN.trim();
@@ -220,32 +220,18 @@ public final class BookManagement {
             if (b.getISBN() == Integer.parseInt(ISBN)) {
                 allBooks.remove(i);
                 found = true;
+                
+                // Success feedback
                 AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
                 JOptionPane.showMessageDialog(null, "Book removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 break;
             }
         }
         
-        if (!found) {
+        if (!found) { // Failure feedback
             AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
             JOptionPane.showMessageDialog(null, "Book not found.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    /**
-     * Calculates and displays total inventory value
-     */
-    public void showTotalBooksCost() {
-        Double totalBooksCost = 0.0;
-        for (Book book : allBooks) {
-            totalBooksCost += book.getPrice();
-        }
-        JOptionPane.showMessageDialog(
-            null, 
-            "Total book cost is $" + totalBooksCost, 
-            "Message", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
 }

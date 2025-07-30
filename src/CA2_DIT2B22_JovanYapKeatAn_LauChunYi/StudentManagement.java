@@ -13,18 +13,22 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+
 /**
- * @author Lau Chun Yi 
- * Handles all student-related operations including:
- * - Student records management
- * - Book borrowing/returning functionality
+ * Manages student records including loading from file,
+ * adding/removing/searching students, and basic validation.
  */
 public final class StudentManagement {
+    
+    // List of all students managed by the system
     private ArrayList<Student> students = new ArrayList<>();
-    Boolean addStudentSuccess;
+    
+    // Flag to indicate if a student was added successfully
+    public boolean addStudentSuccess;
 
     /**
-     * Constructor pre-populates with sample student data
+     * Constructor pre-populates student list by reading from `students.txt`.
+     * Also links students to books they’ve borrowed using data from BookManagement.
      */
     public StudentManagement() {
         try {
@@ -38,22 +42,25 @@ public final class StudentManagement {
             // Skip total number of students (first line)
             scanner.nextLine();
 
+            // Read student records until end of file
             while (scanner.hasNextLine()) {
-                // Read student line
+                // Each student line: name;adminNumber;
                 String studentLine = scanner.nextLine().trim();
                 String[] studentDetails = studentLine.split(";");
                 
-                // Add student
+                // Add student to the internal list
                 this.addStudent(studentDetails[1], studentDetails[0]);
                 Student currentStudent = this.students.get(this.students.size() - 1);
 
+                // Next line gives number of books borrowed
                 int noOfBooksBorrowed = Integer.parseInt(scanner.nextLine().split(";")[0]);
 
-                // Read book lines
+                // Read each borrowed book line and add the corresponding Book object to the currentStudent
                 for (int i = 0; i < noOfBooksBorrowed; i++) {
                     String bookLine = scanner.nextLine().trim();
                     String[] bookDetails = bookLine.split(";");
                     
+                    // Match ISBN from student record with allBooks in BookManagement
                     currentStudent.borrowBook(
                         BookManagement.allBooks.stream()
                         .filter(b -> b.getISBN().toString().equals(bookDetails[2]))
@@ -78,77 +85,53 @@ public final class StudentManagement {
         this.students.add(student);
     }
     
+    /**
+     * Deletes a student by their ID from the internal list.
+     * Plays a success/failure sound and displays dialog feedback.
+     * @param studentID The admin number of the student to delete
+     */
     public void deleteStudent(String studentID) {
         boolean found = false;
-        studentID = studentID.trim();
+        studentID = studentID.trim(); // Remove whitespace
     
         for (int i = 0; i < students.size(); i++) {
             Student s = students.get(i);
             if (s.getAdminNumber().equalsIgnoreCase(studentID)) {
                 students.remove(i);
                 found = true;
+                
+                // Success feedback
                 AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
                 JOptionPane.showMessageDialog(null, "Student removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 break;
             }
         }
         
-        if (!found) {
+        if (!found) { // Failure feedback
             AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
             JOptionPane.showMessageDialog(null, "Student not found.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    /**
-     * Displays all students in formatted HTML table
-     */
-    public void displayAllStudents() {
-        if (students.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                null, 
-                "No students found.", 
-                "Error", 
-                JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-
-        StringBuilder htmlTable = new StringBuilder("<html><table border='1'>");
-        // First row of table
-        htmlTable.append("<tr><th>Admin#</th><th>Name</th><th>Books</th></tr>");
-        
-        for (Student s : students) { // Subsequent rows of table
-            htmlTable.append(String.format(
-                "<tr><td>%s</td><td>%s</td><td>%s</td></tr>",
-                s.getAdminNumber(),
-                s.getName(),
-                s.getBooks().isEmpty() ? "None" : s.getBooks()
-            ));
-        }
-        // End of table
-        htmlTable.append("</table></html>");
-        
-        JOptionPane.showMessageDialog(
-            null, 
-            htmlTable.toString(), 
-            "Student List", 
-            JOptionPane.PLAIN_MESSAGE
-        );
-    }
     
+    /**
+     * Getter for list of all students.
+     * @return List of Student objects
+     */
     public ArrayList<Student> getStudents() {
         return this.students;
     }
 
     /**
-     * Searches for a student by name
+     * Searches for students by exact name match.
+     * @param searchName The name to search
+     * @return List of matched students
      */
     public ArrayList<Student> searchStudentsByName(String searchName) {
         ArrayList<Student> searchedStudents = new ArrayList<>();
 
         searchName = searchName.trim(); // Clean the searchName input
 
-        // Loop through each student object
+        // Compare name of each student to search query (case-sensitive)
         for (Student s : this.students) {
             if (s.getName().equals(searchName)) {
                 searchedStudents.add(s);
@@ -159,7 +142,10 @@ public final class StudentManagement {
     }
 
     /**
-     * Handles new student creation with validation
+     * Adds a student through user input with multiple layers of validation.
+     * Plays sounds and shows messages for each validation error/success.
+     * @param adminNo Admin number input (should be numeric)
+     * @param name Name input (must be >= 3 characters)
      */
     public void promptAndAddStudent(String adminNo, String name) {
         adminNo = adminNo.trim();
@@ -191,225 +177,13 @@ public final class StudentManagement {
             }
         }
 
+        // Passed all validation checks, add student
         addStudentSuccess = true;
         this.addStudent(adminNo, name);
+        
+        // Show success feedback
         AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
         JOptionPane.showMessageDialog(null, "Student added successfully.", "Message", JOptionPane.INFORMATION_MESSAGE);
     }
-
-    /**
-     * Displays total student count
-     */
-    public void showTotalStudents() {
-        JOptionPane.showMessageDialog(
-            null, 
-            "Total number of students: " + students.size(), 
-            "Message", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    /**
-     * Handles book borrowing process
-     */
-    public void promptAndBorrowBook() {
-        Student student = null; // Student object that borrowed the book
-        Book borrowedBook = null; // Borrowed book object
-
-        // Student lookup
-        while (true) {
-            String adminNo = JOptionPane.showInputDialog(
-                null, 
-                "Adm No", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (adminNo == null) return; // User clicks cancel/close
-            for (Student s : students) {
-                if (s.getAdminNumber().equals(adminNo)) {
-                    student = s; // Found student object
-                    break;
-                }
-            }
-            // admin number found
-            if (student != null) break;
-            // admin number not found
-            else {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Admin Number \"" + adminNo + "\" not found.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-
-        // Book borrowing
-        while (true) {
-            String ISBN = JOptionPane.showInputDialog(
-                null, 
-                "Book ISBN", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (ISBN == null) return; // User clicks cancel/close
-            for (Book b : BookManagement.allBooks) {
-                if (ISBN.equals(Integer.toString(b.getISBN()))) {
-                    borrowedBook = b;
-                    break;
-                }
-            }
-            // Book can be found
-            if (borrowedBook != null) {
-                if (borrowedBook.getAvailability() == true) {
-                    // book is available
-                    student.borrowBook(borrowedBook); // This method also sets the book availability to false
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "Book borrowed successfully!", 
-                        "Success", 
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
-                    return;
-                } else {
-                    // book is unavailable
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\fail.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "Book ISBN " + ISBN + " is currently unavailable.", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-                }
-            }
-            // Book cannot be found
-            else {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "ISBN \"" + ISBN + "\" not found.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-    }
-
-    public void promptAndReturnBook() {
-        Student student = null; // object of student who wants to return the book object
-        Book returnBook = null;
-
-        while (true) {
-            // Student lookup
-            String adminNo = JOptionPane.showInputDialog(
-                null, 
-                "Enter student admin number:", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (adminNo == null) return; // User clicks close/cancel
     
-            for (Student s : students) {
-                if (s.getAdminNumber().equals(adminNo)) {
-                    student = s; // Found student object
-                    break;
-                }
-            }
-    
-            // Admin number found
-            if (student != null) {
-                // Student has borrowed books
-                if (!student.getBooks().isEmpty()) break;
-                // Student has no borrowed books
-                else {
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "This student has no books to return!", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-            // Admin number not found
-            else {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Admin Number \"" + adminNo + "\" not found!", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-        
-        while (true) {
-            List<Integer> borrowedBookISBNs = student.getBooks().stream()
-                    .map(Book::getISBN)
-                    .collect(Collectors.toList());
-            List<String> borrowedBookTitles = student.getBooks().stream()
-                    .map(Book::getTitle)
-                    .collect(Collectors.toList());
-
-            String borrowedBookTitlesAndISBNs = "";
-
-            for (int i=0; i<student.getBooks().size(); i++) 
-                borrowedBookTitlesAndISBNs += (
-                    borrowedBookTitles.get(i) + " (ISBN: " + borrowedBookISBNs.get(i) + ")\n"
-                );
-            
-            String returnBookISBN = JOptionPane.showInputDialog(
-                null, 
-                String.format(
-                    "Books borrowed by %s\n%s\n\nEnter book ISBN to return:", 
-                    student.getName(), 
-                    borrowedBookTitlesAndISBNs
-                ), 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE);
-    
-            if (returnBookISBN == null) return; // User clicks close/cancel
-
-            returnBookISBN = returnBookISBN.trim(); // Clean the input string
-    
-            for (int i=0; i<student.getBooks().size(); i++) {
-                Book b = student.getBooks().get(i);
-                if (Integer.toString(b.getISBN()).equals(returnBookISBN)) {
-                    student.removeBook(i);
-                    returnBook = b; // If student has this book, returnBook is no longer null
-                    break;
-                }
-            }
-
-            // return book ISBN is inside the list of the student's borrowed books
-            if (returnBook != null) {
-                for (Book b : BookManagement.allBooks) {
-                    if (Integer.toString(b.getISBN()).equals(returnBookISBN)) {
-                        b.setAvailability(true); // Update book availability
-                        break;
-                    }
-                }
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Book returned successfully!", 
-                    "Message", 
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                return;
-                // return book title is not inside the list of the student's borrowed books
-            } else {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    student.getName() + " didn't borrow that book!", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-    }
 }
