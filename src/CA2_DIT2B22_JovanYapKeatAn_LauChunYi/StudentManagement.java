@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  */
 public final class StudentManagement {
     private ArrayList<Student> students = new ArrayList<>();
+    Boolean addStudentSuccess;
 
     /**
      * Constructor pre-populates with sample student data
@@ -30,7 +31,7 @@ public final class StudentManagement {
             Scanner scanner = new Scanner(
                 new File(
                     System.getProperty("user.dir") + 
-                    "\\students.txt"
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
                 )
             );
             
@@ -75,6 +76,27 @@ public final class StudentManagement {
     public void addStudent(String adminNumber, String name) {
         Student student = new Student(adminNumber, name);
         this.students.add(student);
+    }
+    
+    public void deleteStudent(String studentID) {
+        boolean found = false;
+        studentID = studentID.trim();
+    
+        for (int i = 0; i < students.size(); i++) {
+            Student s = students.get(i);
+            if (s.getAdminNumber().equalsIgnoreCase(studentID)) {
+                students.remove(i);
+                found = true;
+                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
+                JOptionPane.showMessageDialog(null, "Student removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            }
+        }
+        
+        if (!found) {
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+            JOptionPane.showMessageDialog(null, "Student not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -139,83 +161,40 @@ public final class StudentManagement {
     /**
      * Handles new student creation with validation
      */
-    public void promptAndAddStudent() {
+    public void promptAndAddStudent(String adminNo, String name) {
+        adminNo = adminNo.trim();
+        name = name.trim();
+        
+        // Check for name length
+        if (name.length() < 3) {
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
+            JOptionPane.showMessageDialog(null, "Name must be at least 3 characters long.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        String adminNo = null;
-        String name = null;
+        // Check if adminNo is a valid number
+        int number;
+        try {
+            number = Integer.parseInt(adminNo);
+        } catch (NumberFormatException e) {
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+            JOptionPane.showMessageDialog(null, "Admin number must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        while (true) {
-            Boolean adminNoDuplicated = false; // Reset isDuplicated to false at the start of each iteration
-            adminNo = JOptionPane.showInputDialog(
-                null, 
-                "Enter the new student admin number:", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (adminNo == null) return; // User clicks close/cancel
-            
-            adminNo = adminNo.trim(); // Clean the adminNo input
-            
-            if (!adminNo.matches("^[pP]\\d{6}$")) { // Admin number !match format: p*******
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Format of Admin Number must be a 'p' followed by six numeric digits.\nE.g., p242482, p219472, p238274", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-            else { // Admin number matches format p*******
-                for (Student s : this.students) { // Check for duplicates in admin number
-                    if (s.getAdminNumber().equalsIgnoreCase(adminNo)) {
-                        adminNoDuplicated = true;
-                        break;
-                    }
-                }
-                if (adminNoDuplicated) {
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\fail.wav");
-                    JOptionPane.showMessageDialog(
-                        null, 
-                        "Admin number " + adminNo + " already exists.", 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE
-                    );
-                } else break;
+        // Check for duplicate admin number
+        for (Student s : this.students) {
+            if (s.getAdminNumber().equalsIgnoreCase(adminNo)) {
+                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+                JOptionPane.showMessageDialog(null, "Admin number " + adminNo + " already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
         }
 
-        while (true) {
-            name = JOptionPane.showInputDialog(
-                null, 
-                "Enter the new student name:", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (name == null) return; // User clicks cancel/close
-
-            name = name.trim(); // Clean the name input
-
-            if (name.length() < 3) { // Name is less than 3 characters long
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Name must be at least 3 characters long.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            } else // Name is at least 3 characters long
-                break;
-        }
-    
+        addStudentSuccess = true;
         this.addStudent(adminNo, name);
-        AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
-        JOptionPane.showMessageDialog(
-            null, 
-            "Student added successfully.", 
-            "Message", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-    
+        AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
+        JOptionPane.showMessageDialog(null, "Student added successfully.", "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

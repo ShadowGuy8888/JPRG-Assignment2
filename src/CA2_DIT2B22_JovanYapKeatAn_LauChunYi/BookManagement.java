@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 public final class BookManagement {
 
     static ArrayList<Book> allBooks = new ArrayList<>();
+    Boolean addBookSuccess = false;
 
     /**
      * Constructor pre-populates with sample book data
@@ -31,7 +32,7 @@ public final class BookManagement {
             Scanner scanner = new Scanner(
                 new File(
                     System.getProperty("user.dir") + 
-                    "\\books.txt"
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"
                 )
             );
             
@@ -71,6 +72,10 @@ public final class BookManagement {
     public void addBook(String title, String author, Integer ISBN, Double price, String category, Boolean availability) {
         Book book = new Book(title, author, ISBN, price, category, availability);
         allBooks.add(book);
+    }
+    
+    public ArrayList<Book> getBooks() {
+        return BookManagement.allBooks;
     }
 
     /**
@@ -119,152 +124,112 @@ public final class BookManagement {
     /**
      * Handles new book addition with validation
      */
-    public void promptAndAddBook() {
-        String title = null;
-        String author = null;
-        String ISBN = null;
-        String price = null;
-        String category = null;
+    public void promptAndAddBook(String title, String author, String ISBN, Double price, String category, Boolean availability) {
         
-        while (true) {
-            title = JOptionPane.showInputDialog(
+        if (title == null || title.length() < 3) {
+            AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
+            JOptionPane.showMessageDialog(
                 null, 
-                "Enter the new book title :", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (title == null) return;
-            // Title validation
-            else if (title.length() < 3) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Book title must be at least 3 characters long.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-            else break;
+                "Book title must be at least 3 characters long.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            ); return;
         }
 
-        while (true) {
-            author = JOptionPane.showInputDialog(
+        // Author validation
+        if (author == null || author.length() < 3) {
+            AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
+            JOptionPane.showMessageDialog(
                 null, 
-                "Enter the new book author :", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (author == null) return;
-            // Author validation
-            else if (author.length() < 3) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Book author must be at least 3 characters long.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-            else break;
+                "Book author must be at least 3 characters long.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE
+            ); return;
+        }
+        
+        // Check if ISBN is a valid number
+        int number;
+        try {
+            number = Integer.parseInt(ISBN);
+        } catch (NumberFormatException e) {
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+            JOptionPane.showMessageDialog(null, "ISBN must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        while (true) {
-            Boolean ISBNduplicated = false; // Reset isDuplicated to false at the start of each iteration
-            ISBN = JOptionPane.showInputDialog(
-                null, 
-                "Enter the new book ISBN :", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (ISBN == null) return;
-            
-            if (!ISBN.matches("\\d{1,}")) { // Check if format of ISBN string is a valid integer
-                // ISBN is passed as an integer when creating the new Book object later
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+        // Check for duplicate admin number
+        for (Book b : allBooks) {
+            if (b.getISBN() == number) {
+                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
                 JOptionPane.showMessageDialog(
-                    null, 
-                    "Book ISBN must be a valid integer.", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-            } else {
-                for (Book b : allBooks) {
-                    if (b.getISBN().toString().equals(ISBN)) {
-                        ISBNduplicated = true;
-                        break;
-                    }
-                }
-                if (ISBNduplicated) {
-                    AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\fail.wav");
-                    JOptionPane.showMessageDialog(
                         null, 
                         "ISBN " + ISBN + " already exists.", 
                         "Error", 
                         JOptionPane.ERROR_MESSAGE
-                    );
-                } else break;
+                ); return;
             }
         }
-
-        while (true) {
-            price = JOptionPane.showInputDialog(
-                null, 
-                "Enter the new book price :", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
+       
             // Price validation
-            if (price == null) return;
-            
-            if (!price.matches("^\\d+(\\.\\d+)?$")) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            if (price == null || !String.valueOf(price).matches("^\\d+(\\.\\d+)?$")) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
                 JOptionPane.showMessageDialog(
                     null, 
                     "Please enter a valid number.", 
                     "Error", 
                     JOptionPane.ERROR_MESSAGE
-                );
-            } else {
-                if (Double.parseDouble(price) < 5.0) JOptionPane.showMessageDialog(
+                ); return;
+            } else if (price < 5.0) { 
+                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+                JOptionPane.showMessageDialog(
                     null, 
                     "Minimum price is $5.", 
                     "Error", 
                     JOptionPane.ERROR_MESSAGE
-                );
-                else break;
+                ); return;
             }
-        }
 
-        while (true) {
-            category = JOptionPane.showInputDialog(
-                null, 
-                "Enter the new book category :", 
-                "Input", 
-                JOptionPane.QUESTION_MESSAGE
-            );
             // Category validation
-            if (category == null) return;
-            
-            if (category.length() < 3) {
-                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            if (category == null || category.length() < 3) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\huh.wav");
                 JOptionPane.showMessageDialog(
                     null, 
                     "Book category must be at least 3 characters long.", 
                     "Error", 
                     JOptionPane.ERROR_MESSAGE
-                );
-            } else break;
-        }
-
-        this.addBook(title, author, Integer.parseInt(ISBN), Double.parseDouble(price), category, true);
-        AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
+                ); return;
+            } 
+        
+            addBookSuccess = true;
+        this.addBook(title, author, number, price, category, true);
+        AudioPlayer.playSound(System.getProperty("user.dir")+"\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
         JOptionPane.showMessageDialog(
             null, 
             "Book Added", 
             "Message", 
             JOptionPane.INFORMATION_MESSAGE
         );
+    }
     
+    public void deleteBook(String ISBN) {
+        boolean found = false;
+        ISBN = ISBN.trim();
+    
+        for (int i = 0; i < allBooks.size(); i++) {
+            Book b = allBooks.get(i);
+            if (b.getISBN() == Integer.parseInt(ISBN)) {
+                allBooks.remove(i);
+                found = true;
+                AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\success.wav");
+                JOptionPane.showMessageDialog(null, "Book removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            }
+        }
+        
+        if (!found) {
+            AudioPlayer.playSound(System.getProperty("user.dir") + "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\sounds\\fail.wav");
+            JOptionPane.showMessageDialog(null, "Book not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**

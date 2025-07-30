@@ -520,10 +520,14 @@ public class StudentLibrary extends javax.swing.JFrame {
                 AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
                 
                 for (Student s : searchedStudents) {
-                    JLabel studentLabel = new JLabel(
-                        s.getName() + 
-                        (this.showMoreSearchResultDetails ? " " + s.getAdminNumber() : "")
-                    );
+                    String lbl = "<html>";
+                    lbl += s.getName() + ", P" + s.getAdminNumber();
+                    if (this.showMoreSearchResultDetails) {
+                        for (Book b : s.getBooks()) 
+                            lbl += "<br />&nbsp;&nbsp;&nbsp;" + b.getTitle();
+                    }
+                    lbl += "</html>";
+                    JLabel studentLabel = new JLabel(lbl);
                     studentLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // padding
                     searchResultPanel.add(studentLabel);
                 }
@@ -574,30 +578,97 @@ public class StudentLibrary extends javax.swing.JFrame {
             List<String> lines = Files.readAllLines(
                 Paths.get(
                     System.getProperty("user.dir") + 
-                    "\\students.txt"
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
                 )
             );
             ArrayList<String> updatedLines = new ArrayList<>();
             
             for (int i=0; i<lines.size(); i++) {
                 String line = lines.get(i);
+                updatedLines.add(line);
                 if (line.equals(student.getName() + ";" + student.getAdminNumber() + ";")) {
-                    updatedLines.add(line);
                     updatedLines.add(Integer.toString(Integer.parseInt(lines.get(++i).split(";")[0]) + 1) + ";");
-                    updatedLines.add(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory());
-                    
-                } else 
-                    updatedLines.add(line);
+                    updatedLines.add(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";");   
+                }
             }
             
             Files.write(
                 Paths.get(
                     System.getProperty("user.dir") + 
-                    "\\students.txt"
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
                 ), 
                 updatedLines
             );
             
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+    
+    private void returnBookForStudentInDb(Book book, Student student) {
+        try {
+            List<String> lines = Files.readAllLines(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                )
+            );
+            ArrayList<String> updatedLines = new ArrayList<>();
+            
+            for (int i=0; i<lines.size(); i++) {
+                String line = lines.get(i);
+                updatedLines.add(line);
+                if (line.equals(student.getName() + ";" + student.getAdminNumber() + ";")) {
+                    int noOfBooksBorrowed = Integer.parseInt(lines.get(++i).split(";")[0]);
+                    updatedLines.add(Integer.toString(noOfBooksBorrowed - 1) + ";");
+                    int currentStudentLineIndex = i;
+                    for (int j=currentStudentLineIndex; j<(currentStudentLineIndex+noOfBooksBorrowed); j++) {
+                        line = lines.get(++i);
+                        if (!line.equals(book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";")) {
+                            updatedLines.add(line);
+                        } else System.out.println(line);
+                    }
+                }
+            }
+            
+            Files.write(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"
+                ), 
+                updatedLines
+            );
+            
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+    
+    private void updateBookAvailabilityInDb(boolean status, Book book) {
+        try {
+            List<String> lines = Files.readAllLines(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"
+                )
+            );
+            ArrayList<String> updatedLines = new ArrayList<>();
+            updatedLines.add(lines.get(0));
+            
+            for (int i=1; i<lines.size(); i++) { // skip first line of books.txt
+                String line = lines.get(i);
+                if (line.split(";")[2].equals(Integer.toString(book.getISBN()))) 
+                    line = book.getTitle() + ";" + book.getAuthor() + ";" + book.getISBN() + ";" + book.getPrice() + ";" + book.getCategory() + ";" + status + ";";
+                updatedLines.add(line);
+            }
+            
+            Files.write(
+                Paths.get(
+                    System.getProperty("user.dir") + 
+                    "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"
+                ), 
+                updatedLines
+            );
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -615,6 +686,15 @@ public class StudentLibrary extends javax.swing.JFrame {
                         Student currentStudent = (Student) studentCarousell.getClientProperty("student");
                         currentStudent.borrowBook(selectedBook);
                         this.borrowBookForStudentInDb(selectedBook, currentStudent);
+                        this.updateBookAvailabilityInDb(false, selectedBook);
+                        
+                        searchButton.doClick(); // Update display of availability status in search results
+    
+                        // Update book carousell data
+                        bookCarousellIndex = 0;
+                        this.updateBookFields();
+                        this.updateBookBorderTitle();
+                        
                         break;
                         
                     } else 
@@ -665,13 +745,15 @@ public class StudentLibrary extends javax.swing.JFrame {
     private void updateBookFields() {
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
         
-        if (currentStudent.getBooks().isEmpty()) {
+        if (currentStudent.getBooks().isEmpty()) { // If currentStudent has no borrowed books
             bookTitleTextField.setText("");
             bookAuthorTextField.setText("");
             bookIsbnTextField.setText("");
             bookAvailableTextField.setText("");
-            return;
+            returnBookBtn.setVisible(false);
+            return; // return before any IndexOutOfBoundsException gets thrown below
         }
+        returnBookBtn.setVisible(true);
         Book currentBook = currentStudent.getBooks().get(bookCarousellIndex);
         
         bookTitleTextField.setText(currentBook.getTitle());
@@ -740,6 +822,18 @@ public class StudentLibrary extends javax.swing.JFrame {
 
     private void returnBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnBookBtnActionPerformed
         // TODO add your handling code here:
+        Book returnBook = (Book) bookCarousell.getClientProperty("book");
+        Student currentStudent = (Student) studentCarousell.getClientProperty("student");
+        currentStudent.removeBook(returnBook.getISBN());
+        this.returnBookForStudentInDb(returnBook, currentStudent);
+        this.updateBookAvailabilityInDb(true, returnBook);
+        
+        searchButton.doClick(); // Reload display of search results for student/book details
+
+        // Update book carousell data
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
     }//GEN-LAST:event_returnBookBtnActionPerformed
 
     private void nextBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextBookBtnActionPerformed
@@ -753,7 +847,7 @@ public class StudentLibrary extends javax.swing.JFrame {
 
     private void previousBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousBookBtnActionPerformed
         Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
-        if (bookCarousellIndex == 0) 
+        if (bookCarousellIndex == 0 || currentStudent.getBooks().size() == 0) 
             bookCarousellIndex = currentStudent.getBooks().size();
         bookCarousellIndex--;
         this.updateBookFields();

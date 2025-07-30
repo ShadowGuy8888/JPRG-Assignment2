@@ -51,8 +51,21 @@ public class Student {
         book.setAvailability(false);
     }
 
-    public void removeBook(int index) {
-        this.books.remove(index);
+    public void removeBook(int isbn) {
+        boolean removed = false;
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books.get(i).getISBN() == isbn) {
+                books.get(i).setAvailability(true);
+                books.remove(i);
+                removed = true;
+                break;
+            }
+        }
+
+        if (!removed) {
+            throw new IllegalArgumentException("Book with ISBN " + isbn + " not found.");
+        }
     }
 
     @Override

@@ -4,17 +4,44 @@
  */
 package CA2_DIT2B22_JovanYapKeatAn_LauChunYi;
 
+import java.awt.Dimension;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+
 /**
  *
- * @author Jovan
+ * @author Lau Chun Yi 
  */
 public class StudentAndBookManagement extends javax.swing.JFrame {
-
+    private static BookManagement bookManagement = new BookManagement();
+    private static StudentManagement studentManagement = new StudentManagement();
+    
+    private static int studentCarousellIndex = 0;
+    private static int bookCarousellIndex = 0;
+    
+    private boolean searchBtnTriggered = false;
+    private boolean showMoreSearchResultDetails = false;
     /**
      * Creates new form StudentAndBookManagement
      */
     public StudentAndBookManagement() {
         initComponents();
+        
     }
 
     /**
@@ -26,21 +53,850 @@ public class StudentAndBookManagement extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        searchGrp = new javax.swing.ButtonGroup();
+        jLabel1 = new javax.swing.JLabel();
+        studentPanel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        txtName = new javax.swing.JTextField();
+        txtID = new javax.swing.JTextField();
+        btnPreStd = new javax.swing.JButton();
+        btnNextStd = new javax.swing.JButton();
+        btnFstStd = new javax.swing.JButton();
+        btnLastStd = new javax.swing.JButton();
+        btnCreateStd = new javax.swing.JButton();
+        btnDeleteStd = new javax.swing.JButton();
+        searchPanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        btnByStd = new javax.swing.JRadioButton();
+        btnByBook = new javax.swing.JRadioButton();
+        txtSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        bookPanel = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        txtTitle = new javax.swing.JTextField();
+        txtAuthor = new javax.swing.JTextField();
+        txtISBN = new javax.swing.JTextField();
+        txtPrice = new javax.swing.JTextField();
+        txtCategory = new javax.swing.JTextField();
+        txtAvailable = new javax.swing.JTextField();
+        btnPreBook = new javax.swing.JButton();
+        btnNextBook = new javax.swing.JButton();
+        btnFstBook = new javax.swing.JButton();
+        btnLastBook = new javax.swing.JButton();
+        btnAddBook = new javax.swing.JButton();
+        btnDeleteBook = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        searchResult = new javax.swing.JTextArea();
+        btnDisStd = new javax.swing.JButton();
+        btnDisBook = new javax.swing.JButton();
+        btnExit = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(51, 0, 255));
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 51, 255));
+        jLabel1.setText("Student and Book Management");
+        jLabel1.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                jLabel1ComponentResized(evt);
+            }
+        });
+
+        studentPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Student 1 of 3", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 1, 12))); // NOI18N
+        if (!studentManagement.getStudents().isEmpty()) {
+            Student initialStudent = studentManagement.getStudents().get(0);
+            txtName.setText(initialStudent.getName());
+            txtID.setText(initialStudent.getAdminNumber());
+            studentPanel.putClientProperty("student", initialStudent);
+        }
+        this.updateStudentBorderTitle();
+
+        jLabel2.setText("Name:");
+
+        jLabel3.setText("Student ID:");
+
+        txtName.setText("Tan Ben");
+        txtName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNameActionPerformed(evt);
+            }
+        });
+
+        txtID.setText("2501234");
+        txtID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIDActionPerformed(evt);
+            }
+        });
+
+        btnPreStd.setText("Previous");
+        btnPreStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPreStdActionPerformed(evt);
+            }
+        });
+
+        btnNextStd.setText("Next");
+        btnNextStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNextStdActionPerformed(evt);
+            }
+        });
+
+        btnFstStd.setText("First");
+        btnFstStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFstStdActionPerformed(evt);
+            }
+        });
+
+        btnLastStd.setText("Last");
+        btnLastStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLastStdActionPerformed(evt);
+            }
+        });
+
+        btnCreateStd.setText("Create");
+        btnCreateStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateStdActionPerformed(evt);
+            }
+        });
+
+        btnDeleteStd.setText("Delete");
+        btnDeleteStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteStdActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout studentPanelLayout = new javax.swing.GroupLayout(studentPanel);
+        studentPanel.setLayout(studentPanelLayout);
+        studentPanelLayout.setHorizontalGroup(
+            studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(studentPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(studentPanelLayout.createSequentialGroup()
+                        .addComponent(btnPreStd, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnNextStd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnFstStd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnLastStd)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(studentPanelLayout.createSequentialGroup()
+                        .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtID, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                            .addComponent(txtName))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnCreateStd, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnDeleteStd, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(17, 17, 17))))
+        );
+        studentPanelLayout.setVerticalGroup(
+            studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(studentPanelLayout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCreateStd))
+                .addGap(8, 8, 8)
+                .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDeleteStd, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(studentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPreStd)
+                    .addComponent(btnNextStd)
+                    .addComponent(btnFstStd)
+                    .addComponent(btnLastStd))
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+
+        searchPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel4.setText("Search:");
+
+        searchGrp.add(btnByStd);
+        btnByStd.setText("by Student");
+        btnByStd.setSelected(true);
+        btnByStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnByStdActionPerformed(evt);
+            }
+        });
+
+        searchGrp.add(btnByBook);
+        btnByBook.setText("by Book");
+
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+
+        btnSearch.setBackground(new java.awt.Color(238, 238, 24));
+        btnSearch.setText("Search");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout searchPanelLayout = new javax.swing.GroupLayout(searchPanel);
+        searchPanel.setLayout(searchPanelLayout);
+        searchPanelLayout.setHorizontalGroup(
+            searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addGroup(searchPanelLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(searchPanelLayout.createSequentialGroup()
+                                .addComponent(btnByStd)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnByBook))
+                            .addComponent(btnSearch))))
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+        searchPanelLayout.setVerticalGroup(
+            searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(searchPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(searchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnByStd)
+                    .addComponent(btnByBook))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSearch)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        bookPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Book 1 of 5", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.ABOVE_TOP, new java.awt.Font("Segoe UI", 1, 12))); // NOI18N
+        if (!bookManagement.getBooks().isEmpty()) {
+            Book initialBook = bookManagement.getBooks().get(0);
+            txtTitle.setText(initialBook.getTitle());
+            txtAuthor.setText(initialBook.getAuthor());
+            txtISBN.setText(Integer.toString(initialBook.getISBN()));
+            txtAvailable.setText(Boolean.toString(initialBook.getAvailability()));
+            bookPanel.putClientProperty("book", initialBook);
+        }
+        this.updateBookBorderTitle();
+
+        jLabel5.setText("Title:");
+
+        jLabel6.setText("Auhor:");
+
+        jLabel7.setText("ISBN:");
+
+        jLabel8.setText("Price:");
+
+        jLabel9.setText("Category:");
+
+        jLabel10.setText("Available:");
+
+        txtTitle.setText("Java 123");
+
+        txtAuthor.setText("Tan Ken");
+
+        txtISBN.setText("89011");
+
+        txtPrice.setText("12.9");
+        txtPrice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPriceActionPerformed(evt);
+            }
+        });
+
+        txtCategory.setText("Programming");
+        txtCategory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCategoryActionPerformed(evt);
+            }
+        });
+
+        txtAvailable.setText("false");
+        txtAvailable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAvailableActionPerformed(evt);
+            }
+        });
+
+        btnPreBook.setText("Previous");
+        btnPreBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPreBookActionPerformed(evt);
+            }
+        });
+
+        btnNextBook.setText("Next");
+        btnNextBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNextBookActionPerformed(evt);
+            }
+        });
+
+        btnFstBook.setText("First");
+        btnFstBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFstBookActionPerformed(evt);
+            }
+        });
+
+        btnLastBook.setText("Last");
+        btnLastBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLastBookActionPerformed(evt);
+            }
+        });
+
+        btnAddBook.setText("Add New Book");
+        btnAddBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddBookActionPerformed(evt);
+            }
+        });
+
+        btnDeleteBook.setText("Delete Book");
+        btnDeleteBook.setPreferredSize(new java.awt.Dimension(96, 37));
+        btnDeleteBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteBookActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bookPanelLayout = new javax.swing.GroupLayout(bookPanel);
+        bookPanel.setLayout(bookPanelLayout);
+        bookPanelLayout.setHorizontalGroup(
+            bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bookPanelLayout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bookPanelLayout.createSequentialGroup()
+                        .addComponent(btnPreBook)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnNextBook)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnFstBook)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnLastBook))
+                    .addGroup(bookPanelLayout.createSequentialGroup()
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(bookPanelLayout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(51, 51, 51)
+                                .addComponent(txtTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(bookPanelLayout.createSequentialGroup()
+                                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel9)
+                                    .addComponent(jLabel8))
+                                .addGap(25, 25, 25)
+                                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtAuthor)
+                                    .addComponent(txtISBN)
+                                    .addComponent(txtPrice)
+                                    .addComponent(txtCategory)
+                                    .addComponent(txtAvailable))))
+                        .addGap(34, 34, 34)
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnAddBook, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnDeleteBook, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        bookPanelLayout.setVerticalGroup(
+            bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bookPanelLayout.createSequentialGroup()
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bookPanelLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(txtTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(txtAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bookPanelLayout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(btnAddBook, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnDeleteBook, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(bookPanelLayout.createSequentialGroup()
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtISBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8))))
+                .addGap(5, 5, 5)
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtAvailable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel10))
+                .addGap(18, 18, 18)
+                .addGroup(bookPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNextBook)
+                    .addComponent(btnPreBook)
+                    .addComponent(btnFstBook)
+                    .addComponent(btnLastBook))
+                .addContainerGap(31, Short.MAX_VALUE))
+        );
+
+        jLabel11.setText("Search Result:");
+
+        searchResult.setColumns(20);
+        searchResult.setRows(5);
+        jScrollPane1.setViewportView(searchResult);
+
+        btnDisStd.setBackground(new java.awt.Color(51, 51, 255));
+        btnDisStd.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnDisStd.setForeground(new java.awt.Color(255, 255, 255));
+        btnDisStd.setText("Display Student Information");
+        btnDisStd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDisStdActionPerformed(evt);
+            }
+        });
+
+        btnDisBook.setBackground(new java.awt.Color(51, 51, 255));
+        btnDisBook.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnDisBook.setForeground(new java.awt.Color(255, 255, 255));
+        btnDisBook.setText("Display Book Information");
+        btnDisBook.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDisBookActionPerformed(evt);
+            }
+        });
+
+        btnExit.setBackground(new java.awt.Color(51, 51, 255));
+        btnExit.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExit.setForeground(new java.awt.Color(255, 255, 255));
+        btnExit.setText("Exit");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(bookPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(studentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(searchPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel11)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(btnDisBook, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnDisStd, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
+                            .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(201, 201, 201)
+                        .addComponent(jLabel1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(searchPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(studentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnDisStd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDisBook)
+                        .addGap(7, 7, 7)
+                        .addComponent(btnExit))
+                    .addComponent(bookPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 15, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void updateStudentFields() {
+        if (studentManagement.getStudents().isEmpty()) {
+            txtName.setText("");
+            txtID.setText("");
+            return;
+        }
+        Student currentStudent = studentManagement.getStudents().get(studentCarousellIndex);
+        txtName.setText(currentStudent.getName());
+        txtID.setText(currentStudent.getAdminNumber());
+        studentPanel.putClientProperty("student", currentStudent);
+    }
+    
+    private void updateStudentBorderTitle() {
+        studentPanel.setBorder(
+            BorderFactory.createTitledBorder(
+                "Student " + (studentCarousellIndex + 1) + 
+                " of " + studentManagement.getStudents().size()
+            )
+        );
+    }
+    
+    private void updateBookBorderTitle() {
+        bookPanel.setBorder(
+            BorderFactory.createTitledBorder(
+                "Book " + (bookCarousellIndex + 1) + 
+                " of " + bookManagement.getBooks().size()
+            )
+        );
+    }
+    
+    private void updateBookFields() {
+        if (bookManagement.getBooks().isEmpty()) {
+            txtTitle.setText("");
+            txtAuthor.setText("");
+            txtISBN.setText("");
+            txtAvailable.setText("");
+            return;
+        }
+        Book currentBook = bookManagement.getBooks().get(bookCarousellIndex);
+        
+        txtTitle.setText(currentBook.getTitle());
+        txtAuthor.setText(currentBook.getAuthor());
+        txtISBN.setText(Integer.toString(currentBook.getISBN()));
+        txtAvailable.setText(Boolean.toString(currentBook.getAvailability()));
+        bookPanel.putClientProperty("book", currentBook);
+    }
+    
+    private void jLabel1ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jLabel1ComponentResized
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel1ComponentResized
+
+    private void btnPreStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreStdActionPerformed
+        // TODO add your handling code here:
+        if (studentCarousellIndex == 0) studentCarousellIndex = studentManagement.getStudents().size();
+        studentCarousellIndex--;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+    }//GEN-LAST:event_btnPreStdActionPerformed
+
+    private void btnNextStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextStdActionPerformed
+        // TODO add your handling code here:
+        if (studentCarousellIndex == studentManagement.getStudents().size() - 1) 
+            studentCarousellIndex = -1;
+        studentCarousellIndex++;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+    }//GEN-LAST:event_btnNextStdActionPerformed
+
+    private void txtCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCategoryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCategoryActionPerformed
+
+    private void btnPreBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreBookActionPerformed
+        // TODO add your handling code here:
+        if (bookCarousellIndex == 0) bookCarousellIndex = bookManagement.getBooks().size();
+        bookCarousellIndex--;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_btnPreBookActionPerformed
+
+    private void txtPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPriceActionPerformed
+
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this, "Program terminated.\nThank You!", "Exit", JOptionPane.INFORMATION_MESSAGE);
+        System.exit(0);
+    }//GEN-LAST:event_btnExitActionPerformed
+
+    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNameActionPerformed
+
+    private void btnCreateStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateStdActionPerformed
+        // TODO add your handling code here:
+    String name = txtName.getText();
+    String studentId = txtID.getText();
+//
+//    // Add student to internal list
+    studentManagement.promptAndAddStudent(studentId, name);
+    
+   // ---- Save to students.txt ----
+   if (studentManagement.addStudentSuccess) {
+    Path path = Paths.get("src/CA2_DIT2B22_JovanYapKeatAn_LauChunYi/students.txt");
+    try {
+        List<String> lines = Files.readAllLines(path);
+
+        // Update student count at the top
+        int totalStudents = Integer.parseInt(lines.get(0).replace(";", "").trim());
+        totalStudents++;
+        lines.set(0, totalStudents + ";");
+
+        // Append new student block (0 borrowed books)
+        lines.add(name + ";" + studentId + ";");
+        lines.add("0;");
+
+        // Write all back to file
+        Files.write(path, lines, StandardCharsets.UTF_8);
+    } catch (IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error saving student to file.");
+    }
+   }
+    }//GEN-LAST:event_btnCreateStdActionPerformed
+
+    private void txtIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIDActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIDActionPerformed
+
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        this.searchBtnTriggered = true;
+        searchResult.removeAll();
+        searchResult.setLayout(new BoxLayout(searchResult, BoxLayout.Y_AXIS));
+        
+        if (btnByStd.isSelected()) {
+            ArrayList<Student> searchedStudents = studentManagement.searchStudentsByName(txtSearch.getText());
+            
+            if (searchedStudents.size() > 0) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
+                
+                for (Student s : searchedStudents) {
+                    String labelText = s.getName() +
+                            (this.showMoreSearchResultDetails 
+                            ? " " + s.getAdminNumber() + "<br>" + s.getBooks() 
+                            : "");
+                    
+                    JLabel studentLabel = new JLabel("<html>" + labelText + "</html>");
+                    studentLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // padding
+                    searchResult.add(studentLabel);
+                }
+            } else 
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            
+        } else if (btnByBook.isSelected()) {
+            ArrayList<Book> searchedBooks = bookManagement.searchBooksByTitle(txtSearch.getText());
+            
+            if (searchedBooks.size() > 0) {
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\success.wav");
+                
+                ButtonGroup bookGroup = new ButtonGroup();
+                
+                for (Book b : searchedBooks) {
+                    String availabilityText = b.getAvailability() 
+                            ? "<span style='color:green;'>Available</span>" 
+                            : "<span style='color:red;'>Unavailable</span>";
+
+                    String labelText = b.getTitle() +
+                            (this.showMoreSearchResultDetails 
+                            ? " (" + b.getISBN() + ") " + availabilityText 
+                            : "");
+                    // Use HTML to enable styling
+                    JLabel bookLabel = new JLabel("<html>" + labelText + "</html>");
+                    bookLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+                    searchResult.add(bookLabel);
+                }
+            } else { // book not found
+                AudioPlayer.playSound(System.getProperty("user.dir")+"\\sounds\\huh.wav");
+            }
+        }
+        searchResult.revalidate();
+        searchResult.repaint();
+        searchResult.setPreferredSize(new Dimension(searchResult.getWidth(), 100));
+//        searchResultScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//        searchResultScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnByStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnByStdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnByStdActionPerformed
+
+    private void btnDeleteStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteStdActionPerformed
+        // TODO add your handling code here:
+        String studentId = txtID.getText();
+        studentManagement.deleteStudent(studentId);
+        
+        // Save updated list to file
+        try (PrintWriter writer = new PrintWriter(new FileWriter(
+                System.getProperty("user.dir") + 
+                        "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\students.txt"))) {
+            writer.println(studentManagement.getStudents().size());
+            for (Student s : studentManagement.getStudents()) {
+                writer.println(s.getName() + ";" + s.getAdminNumber() + ";");
+                writer.println(s.getBooks().size());
+                for (Book b : s.getBooks()) {
+                    writer.println(b.getTitle() + ";" + b.getAuthor() + ";" + 
+                            b.getISBN() + ";" + b.getPrice() + ";" + 
+                            b.getCategory() + ";");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnDeleteStdActionPerformed
+
+    private void btnAddBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBookActionPerformed
+        // TODO add your handling code here:
+        String title = txtTitle.getText();
+        String author = txtAuthor.getText();
+        String ISBN = txtISBN.getText();
+        Double price = Double.parseDouble(txtPrice.getText());
+        String category = txtCategory.getText();
+        Boolean available = Boolean.parseBoolean(txtAvailable.getText());
+        bookManagement.promptAndAddBook(title, author, ISBN, price, category, available);
+        
+        if (bookManagement.addBookSuccess) {
+        // ---- Save to books.txt ----
+        Path path = Paths.get("src/CA2_DIT2B22_JovanYapKeatAn_LauChunYi/books.txt");
+        try {
+            List<String> lines = Files.readAllLines(path);
+
+            // Update student count at the top
+            int totalBooks = Integer.parseInt(lines.get(0).replace(";", "").trim());
+            totalBooks++;
+            lines.set(0, totalBooks + ";");
+
+            // Append new student block (0 borrowed books)
+            lines.add(title + ";" + author + ";" + ISBN + ";" + price + ";" + category + ";" + available + ";");
+
+            // Write all back to file
+            Files.write(path, lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error saving book to file.");
+        }
+        }
+    }//GEN-LAST:event_btnAddBookActionPerformed
+
+    private void btnFstStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFstStdActionPerformed
+        // TODO add your handling code here:
+        studentCarousellIndex = 0;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+    }//GEN-LAST:event_btnFstStdActionPerformed
+
+    private void btnDeleteBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteBookActionPerformed
+        // TODO add your handling code here:
+//        String title = txtTitle.getText();
+//        String author = txtAuthor.getText();
+        String ISBN = txtISBN.getText();
+//        String price = txtPrice.getText();
+//        String category = txtCategory.getText();
+        bookManagement.deleteBook(ISBN);
+        
+        // Save updated list to file
+        try (PrintWriter writer = new PrintWriter(new FileWriter(
+                System.getProperty("user.dir") + 
+                        "\\src\\CA2_DIT2B22_JovanYapKeatAn_LauChunYi\\books.txt"))) {
+            writer.println(bookManagement.getBooks().size());
+            for (Book b : bookManagement.getBooks()) {
+                writer.println(b.getTitle()+ ";" + b.getAuthor()+ ";" + b.getISBN() + ";" 
+                        + b.getPrice() + ";" + b.getCategory() + ";" + b.getAvailability());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnDeleteBookActionPerformed
+
+    private void btnLastStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastStdActionPerformed
+        // TODO add your handling code here:
+        studentCarousellIndex = studentManagement.getStudents().size() - 1;
+        this.updateStudentFields();
+        this.updateStudentBorderTitle();
+    }//GEN-LAST:event_btnLastStdActionPerformed
+
+    private void btnFstBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFstBookActionPerformed
+        // TODO add your handling code here:
+        bookCarousellIndex = 0;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_btnFstBookActionPerformed
+
+    private void btnLastBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastBookActionPerformed
+        // TODO add your handling code here:
+        bookCarousellIndex = bookManagement.getBooks().size() - 1;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_btnLastBookActionPerformed
+
+    private void btnNextBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextBookActionPerformed
+        // TODO add your handling code here:
+        if (bookCarousellIndex == bookManagement.getBooks().size() - 1) 
+            bookCarousellIndex = -1;
+        bookCarousellIndex++;
+        this.updateBookFields();
+        this.updateBookBorderTitle();
+    }//GEN-LAST:event_btnNextBookActionPerformed
+
+    private void txtAvailableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAvailableActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAvailableActionPerformed
+
+    private void btnDisStdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisStdActionPerformed
+        // TODO add your handling code here:
+        if (this.searchBtnTriggered && btnByStd.isSelected()) {
+            this.showMoreSearchResultDetails = !this.showMoreSearchResultDetails;
+            btnSearch.doClick();
+        }
+    }//GEN-LAST:event_btnDisStdActionPerformed
+
+    private void btnDisBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisBookActionPerformed
+        // TODO add your handling code here:
+        if (this.searchBtnTriggered && btnByBook.isSelected()) {
+            this.showMoreSearchResultDetails = !this.showMoreSearchResultDetails;
+            btnSearch.doClick();
+        }
+    }//GEN-LAST:event_btnDisBookActionPerformed
 
     /**
      * @param args the command line arguments
@@ -78,5 +934,49 @@ public class StudentAndBookManagement extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bookPanel;
+    private javax.swing.JButton btnAddBook;
+    private javax.swing.JRadioButton btnByBook;
+    private javax.swing.JRadioButton btnByStd;
+    private javax.swing.JButton btnCreateStd;
+    private javax.swing.JButton btnDeleteBook;
+    private javax.swing.JButton btnDeleteStd;
+    private javax.swing.JButton btnDisBook;
+    private javax.swing.JButton btnDisStd;
+    private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnFstBook;
+    private javax.swing.JButton btnFstStd;
+    private javax.swing.JButton btnLastBook;
+    private javax.swing.JButton btnLastStd;
+    private javax.swing.JButton btnNextBook;
+    private javax.swing.JButton btnNextStd;
+    private javax.swing.JButton btnPreBook;
+    private javax.swing.JButton btnPreStd;
+    private javax.swing.JButton btnSearch;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.ButtonGroup searchGrp;
+    private javax.swing.JPanel searchPanel;
+    private javax.swing.JTextArea searchResult;
+    private javax.swing.JPanel studentPanel;
+    private javax.swing.JTextField txtAuthor;
+    private javax.swing.JTextField txtAvailable;
+    private javax.swing.JTextField txtCategory;
+    private javax.swing.JTextField txtID;
+    private javax.swing.JTextField txtISBN;
+    private javax.swing.JTextField txtName;
+    private javax.swing.JTextField txtPrice;
+    private javax.swing.JTextField txtSearch;
+    private javax.swing.JTextField txtTitle;
     // End of variables declaration//GEN-END:variables
 }
